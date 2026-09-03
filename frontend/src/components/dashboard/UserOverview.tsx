@@ -13,6 +13,7 @@ import {
   HandCoins,
   Landmark,
   Loader2,
+  Lock,
   PiggyBank,
   Receipt,
   Sparkles,
@@ -212,7 +213,7 @@ function ToolCard({ meta, finance }: { meta: ToolMeta; finance: DashboardOvervie
 
 export default function UserOverview() {
   const router = useRouter();
-  const { profile, user } = useAuth();
+  const { profile, user, loading: authLoading } = useAuth();
   const [overview, setOverview] = useState<DashboardOverviewData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -238,8 +239,13 @@ export default function UserOverview() {
   }
 
   useEffect(() => {
+    if (authLoading) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     void loadOverview();
-  }, []);
+  }, [authLoading, user]);
 
   const displayName =
     profile?.name ||
@@ -333,11 +339,31 @@ export default function UserOverview() {
     );
   }
 
-  if (loading) {
+  if (authLoading || (loading && user)) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center p-10">
         <Loader2 className="h-10 w-10 animate-spin text-indigo-600" />
         <p className="mt-3 text-sm text-slate-500">Loading your dashboard…</p>
+      </div>
+    );
+  }
+
+  if (!user && !authLoading) {
+    return (
+      <div className="mx-auto flex flex-1 flex-col items-center justify-center p-10 text-center max-w-md">
+        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
+          <Lock className="h-7 w-7" />
+        </div>
+        <h2 className="text-2xl font-bold text-slate-900">Sign in to view your dashboard</h2>
+        <p className="mt-2 text-sm text-slate-500">
+          Your personal finance overview, expense tracking, savings goals, and saved schemes are linked to your account.
+        </p>
+        <Link
+          href="/login"
+          className="mt-6 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow transition hover:bg-indigo-700"
+        >
+          Sign In / Create Account
+        </Link>
       </div>
     );
   }
@@ -381,9 +407,22 @@ export default function UserOverview() {
             </p>
           </div>
           <div className="flex flex-wrap gap-2.5">
+            {overview?.analyses?.[0] && (
+              <button
+                type="button"
+                onClick={() => openAnalysis(overview.analyses[0].id)}
+                className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-bold text-indigo-800 shadow transition hover:-translate-y-0.5"
+              >
+                <BarChart3 className="h-4 w-4" /> View Feasibility Report
+              </button>
+            )}
             <Link
               href="/onboarding"
-              className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-bold text-indigo-800 shadow transition hover:-translate-y-0.5"
+              className={`inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold shadow transition hover:-translate-y-0.5 ${
+                overview?.analyses?.[0]
+                  ? 'bg-white/10 text-white ring-1 ring-white/30 hover:bg-white/20'
+                  : 'bg-white text-indigo-800'
+              }`}
             >
               <TrendingUp className="h-4 w-4" /> New analysis
             </Link>

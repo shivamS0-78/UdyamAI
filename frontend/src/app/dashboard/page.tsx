@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useEffect, useState, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { Loader2, Sparkles, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Loader2, Sparkles, AlertTriangle, ShieldCheck, ArrowLeft } from 'lucide-react';
 import AppShell from '@/components/ui/AppShell';
 import DashboardNav, { DashboardSection } from '@/components/dashboard/DashboardNav';
 import FinancialSection from '@/components/dashboard/FinancialSection';
@@ -31,6 +31,7 @@ function isDashboardSection(value: string | null): value is DashboardSection {
 }
 
 function DashboardContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [activeSection, setActiveSection] = useState<DashboardSection>('overview');
   const [data, setData] = useState<ConsolidatedAnalysisData | null>(null);
@@ -39,7 +40,7 @@ function DashboardContent() {
   const [pdfError, setPdfError] = useState<string | null>(null);
   const t = useLanguageStore((s) => s.t);
 
-  const analysisId = searchParams.get('analysis_id') || (typeof window !== 'undefined' ? localStorage.getItem('udyam_active_analysis_id') : null);
+  const analysisId = searchParams.get('analysis_id');
 
   // Apply ?section= (e.g. from the overview's scheme rows) once the data for
   // the target analysis run is available.
@@ -181,8 +182,16 @@ function DashboardContent() {
     <AppShell>
       <main className="p-6 max-w-5xl mx-auto flex flex-col gap-4 w-full flex-1">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b pb-4 gap-3">
           <div>
+            <button
+              type="button"
+              onClick={() => router.push('/dashboard')}
+              className="mb-2 inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600 transition hover:bg-slate-200 hover:text-slate-900"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              Back to Personal Dashboard
+            </button>
             <h1 className="text-3xl font-bold text-slate-900">{t('dash.title')}</h1>
             <p className="text-gray-600 mt-1 font-medium">
               {bizName || t('dash.pendingBiz')} •{' '}
