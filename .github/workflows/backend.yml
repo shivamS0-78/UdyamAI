@@ -2,9 +2,9 @@ name: Backend CI
 
 on:
   push:
-    branches: [ main, dev ]
+    branches: [ main, dev, staging ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, staging ]
 
 jobs:
   build-and-test:
@@ -37,7 +37,20 @@ jobs:
         cd backend
         python -c "from app.main import app; print('App imports OK')"
 
+    - name: Initialize test database and validate migrations
+      run: |
+        cd backend
+        python -c "import sqlite3; sqlite3.connect('./test.db').close()"
+        alembic upgrade head
+        alembic current
+      env:
+        SQLALCHEMY_DATABASE_URL: sqlite:///./test.db
+
     - name: Run Tests
       run: |
         cd backend
         pytest -v
+      env:
+        DATABASE_URL: sqlite:///./test.db
+        SQLALCHEMY_DATABASE_URL: sqlite:///./test.db
+

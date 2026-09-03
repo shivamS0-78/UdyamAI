@@ -1,0 +1,53 @@
+district_name,taluka_name,village_name,animal_type,animal_count,milk_production,milk_production_unit,year
+Pune,Haveli,Wagholi,Cattle (Crossbred),1420,11360.0,Liters/Day,2019
+Pune,Haveli,Wagholi,Buffalo (Murrah),980,8820.0,Liters/Day,2019
+Pune,Haveli,Wagholi,Goat,650,0.0,Liters/Day,2019
+Pune,Baramati,Malegaon Bk,Cattle (Crossbred),2850,25650.0,Liters/Day,2019
+Pune,Baramati,Malegaon Bk,Buffalo,1920,17280.0,Liters/Day,2019
+Satara,Satara,Vaduth,Cattle (Crossbred),1850,14800.0,Liters/Day,2019
+Satara,Karad,Umbraj,Buffalo,2100,18900.0,Liters/Day,2019
+Sangli,Miraj,Budhgaon,Cattle,1650,13200.0,Liters/Day,2019
+Sangli,Walwa,Islampur,Buffalo (Pandharpuri),2950,29500.0,Liters/Day,2019
+Kolhapur,Karveer,Gokul Shirgaon,Buffalo (Pandharpuri/Murrah),3120,31200.0,Liters/Day,2019
+Kolhapur,Karveer,Gokul Shirgaon,Cattle (Crossbred),1850,16650.0,Liters/Day,2019
+Solapur,Pandharpur,Bhalwani,Goat (Osmanabadi),1450,0.0,Liters/Day,2019
+Solapur,Pandharpur,Bhalwani,Sheep,1120,0.0,Liters/Day,2019
+Ahilyanagar,Rahata,Shirdi,Cattle (Crossbred),3240,29160.0,Liters/Day,2019
+Ahilyanagar,Sangamner,Ghumari,Buffalo,2150,19350.0,Liters/Day,2019
+Nashik,Niphad,Ozar,Cattle,1150,8050.0,Liters/Day,2019
+Nashik,Niphad,Ozar,Goat,820,0.0,Liters/Day,2019
+Jalgaon,Raver,Khiroda,Cattle,980,6860.0,Liters/Day,2019
+Jalgaon,Bhusawal,Varangaon,Buffalo,1250,10000.0,Liters/Day,2019
+Dhule,Shirpur,Boradi,Goat,1120,0.0,Liters/Day,2019
+Nandurbar,Shahada,Kheddigar,Poultry (Desi),8500,0.0,Eggs/Day,2019
+Chhatrapati Sambhajinagar,Paithan,Paithan,Buffalo,1340,10720.0,Liters/Day,2019
+Jalna,Ambad,Ghansawangi,Goat,980,0.0,Liters/Day,2019
+Parbhani,Gangakhed,Gangakhed,Buffalo,1180,9440.0,Liters/Day,2019
+Hingoli,Kalamnuri,Kalamnuri,Cattle,890,6230.0,Liters/Day,2019
+Nanded,Mukhed,Mukhed,Goat,980,0.0,Liters/Day,2019
+Nanded,Degloor,Degloor,Cattle,1250,8750.0,Liters/Day,2019
+Latur,Ausa,Killari,Buffalo,1420,11360.0,Liters/Day,2019
+Beed,Parli,Parli Vaijnath,Goat (Osmanabadi),1680,0.0,Liters/Day,2019
+Dharashiv,Tuljapur,Naldurg,Goat (Osmanabadi),1950,0.0,Liters/Day,2019
+Nagpur,Hingna,Hingna,Cattle (Indigenous),890,3560.0,Liters/Day,2019
+Nagpur,Hingna,Hingna,Poultry (Layers),12500,0.0,Eggs/Day,2019
+Wardha,Hinganghat,Hinganghat,Cattle,1120,7840.0,Liters/Day,2019
+Buldhana,Khamgaon,Shegaon,Cattle,1350,9450.0,Liters/Day,2019
+Akola,Murtizapur,Murtizapur,Buffalo,1180,9440.0,Liters/Day,2019
+Washim,Karanja,Karanja Lad,Goat,1050,0.0,Liters/Day,2019
+Amravati,Achalpur,Paratwada,Cattle,1620,9720.0,Liters/Day,2019
+Amravati,Morshi,Warud,Cattle,1450,10150.0,Liters/Day,2019
+Yavatmal,Pusad,Pusad,Cattle,1850,12950.0,Liters/Day,2019
+Chandrapur,Warora,Warora,Cattle,1240,7440.0,Liters/Day,2019
+Bhandara,Sakoli,Sakoli,Cattle,1150,6900.0,Liters/Day,2019
+Gondia,Tiroda,Tiroda,Cattle,1380,8280.0,Liters/Day,2019
+Gadchiroli,Armori,Armori,Cattle,1490,7450.0,Liters/Day,2019
+Ratnagiri,Chiplun,Khed,Cattle (Konkan Kapila),980,4900.0,Liters/Day,2019
+Ratnagiri,Lanja,Lanja,Goat,750,0.0,Liters/Day,2019
+Sindhudurg,Kudal,Kudal,Cattle (Konkan Kapila),1120,5600.0,Liters/Day,2019
+Sindhudurg,Kankavli,Kankavli,Buffalo,890,6230.0,Liters/Day,2019
+Raigad,Mahad,Birwadi,Cattle,680,3400.0,Liters/Day,2019
+Raigad,Pen,Wadkhal,Buffalo,820,5740.0,Liters/Day,2019
+Palghar,Dahanu,Vangaon,Poultry (Desi),9500,0.0,Eggs/Day,2019
+Thane,Bhiwandi,Padgha,Cattle,1150,8050.0,Liters/Day,2019
+Mumbai Suburban,Kurla,Taloja Periurban,Buffalo,1450,11600.0,Liters/Day,2019

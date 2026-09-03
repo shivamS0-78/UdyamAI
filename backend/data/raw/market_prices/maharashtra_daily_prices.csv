@@ -1,0 +1,42 @@
+market_name,district_name,taluka_name,village_name,commodity,commodity_variety,unit,min_price,max_price,modal_price,arrival_quantity,arrival_unit,recorded_date
+Pune APMC Market Yard,Pune,Haveli,Wagholi,Milk (Cow),Pasteurized Pack,Liter,54.0,58.0,56.0,120.0,Tons,2024-03-01
+Pune APMC Market Yard,Pune,Haveli,Wagholi,Onion,Red Onion,Quintal,1800.0,2400.0,2150.0,450.0,Tons,2024-03-01
+Baramati APMC Mandi,Pune,Baramati,Malegaon Bk,Sugarcane,Jaggery Grade,Quintal,3100.0,3600.0,3350.0,520.0,Tons,2024-03-01
+Satara APMC Mandi,Satara,Satara,Vaduth,Ginger,Satara Fresh,Quintal,6500.0,8500.0,7200.0,85.0,Tons,2024-03-01
+Sangli APMC Turmeric & Grain Yard,Sangli,Miraj,Budhgaon,Turmeric,Rajapuri Turmeric,Quintal,12500.0,16500.0,14200.0,680.0,Tons,2024-03-01
+Kolhapur Shahu Market Yard,Kolhapur,Karveer,Gokul Shirgaon,Jaggery,Jaggery Cubes,Quintal,3400.0,4100.0,3800.0,520.0,Tons,2024-03-01
+Kolhapur Shahu Market Yard,Kolhapur,Karveer,Gokul Shirgaon,Milk (Buffalo),Raw Milk,Liter,62.0,68.0,65.0,210.0,Tons,2024-03-01
+Pandharpur APMC Mandi,Solapur,Pandharpur,Bhalwani,Pomegranate,Bhagwa,Quintal,6500.0,9500.0,8000.0,110.0,Tons,2024-03-01
+Rahata APMC Mandi,Ahilyanagar,Rahata,Shirdi,Guava,Shirdi Red,Quintal,2500.0,3800.0,3200.0,140.0,Tons,2024-03-01
+Lasalgaon APMC Onion Mandi,Nashik,Niphad,Pimpalgaon Baswant,Onion,Garwa / Red,Quintal,1600.0,2250.0,1950.0,1250.0,Tons,2024-03-01
+Pimpalgaon Baswant APMC Mandi,Nashik,Niphad,Ozar,Grapes,Thompson Seedless,Quintal,4500.0,6500.0,5500.0,320.0,Tons,2024-03-01
+Raver APMC Banana Mandi,Jalgaon,Raver,Khiroda,Banana,Grand Naine,Quintal,1200.0,1800.0,1500.0,850.0,Tons,2024-03-01
+Shirpur APMC Mandi,Dhule,Shirpur,Boradi,Cotton,Medium Staple,Quintal,6900.0,7500.0,7200.0,310.0,Tons,2024-03-01
+Shahada APMC Mandi,Nandurbar,Shahada,Kheddigar,Maize,Yellow Maize,Quintal,1950.0,2300.0,2150.0,280.0,Tons,2024-03-01
+Paithan APMC Mandi,Chhatrapati Sambhajinagar,Paithan,Paithan,Sweet Lime,Mosambi Grade 1,Quintal,2800.0,3800.0,3300.0,150.0,Tons,2024-03-01
+Jalna Grain & Seed Market Yard,Jalna,Ambad,Ghansawangi,Sweet Lime,Mosambi,Quintal,2700.0,3600.0,3150.0,210.0,Tons,2024-03-01
+Parbhani APMC Mandi,Parbhani,Gangakhed,Gangakhed,Soyabean,Yellow,Quintal,4300.0,4750.0,4550.0,380.0,Tons,2024-03-01
+Hingoli APMC Mandi,Hingoli,Kalamnuri,Kalamnuri,Soyabean,Yellow,Quintal,4250.0,4700.0,4500.0,290.0,Tons,2024-03-01
+Nanded APMC Mandi,Nanded,Mukhed,Mukhed,Cotton,Long Staple,Quintal,7100.0,7750.0,7450.0,410.0,Tons,2024-03-01
+Latur Pulse & Oilseed APMC Yard,Latur,Ausa,Killari,Soyabean,Latur Grade 1,Quintal,4400.0,4900.0,4680.0,1120.0,Tons,2024-03-01
+Latur Pulse & Oilseed APMC Yard,Latur,Ausa,Killari,Toor Dal,Red Gram,Quintal,8800.0,10500.0,9600.0,650.0,Tons,2024-03-01
+Parli APMC Cotton & Grain Mandi,Beed,Parli,Parli Vaijnath,Cotton,Medium Staple,Quintal,6850.0,7450.0,7150.0,350.0,Tons,2024-03-01
+Dharashiv APMC Mandi,Dharashiv,Tuljapur,Naldurg,Soyabean,Yellow,Quintal,4300.0,4750.0,4550.0,310.0,Tons,2024-03-01
+Nagpur Kalamna APMC Mandi,Nagpur,Hingna,Hingna,Orange,Nagpur Santra,Quintal,3200.0,4800.0,4000.0,280.0,Tons,2024-03-01
+Nagpur Kalamna APMC Mandi,Nagpur,Hingna,Hingna,Cotton,Medium Staple,Quintal,6800.0,7400.0,7100.0,190.0,Tons,2024-03-01
+Hinganghat APMC Cotton Yard,Wardha,Hinganghat,Hinganghat,Cotton,Long Staple,Quintal,7200.0,7850.0,7550.0,890.0,Tons,2024-03-01
+Khamgaon APMC Cotton & Oilseed Yard,Buldhana,Khamgaon,Shegaon,Cotton,Medium Staple,Quintal,6950.0,7550.0,7250.0,750.0,Tons,2024-03-01
+Akola Cotton APMC Yard,Akola,Murtizapur,Murtizapur,Cotton,Long Staple,Quintal,7150.0,7750.0,7480.0,620.0,Tons,2024-03-01
+Karanja APMC Mandi,Washim,Karanja,Karanja Lad,Soyabean,Yellow,Quintal,4350.0,4800.0,4600.0,480.0,Tons,2024-03-01
+Achalpur APMC Mandi,Amravati,Achalpur,Paratwada,Soyabean,Yellow Soyabean,Quintal,4200.0,4700.0,4500.0,340.0,Tons,2024-03-01
+Yavatmal APMC Mandi,Yavatmal,Pusad,Pusad,Cotton,Long Staple,Quintal,7100.0,7700.0,7420.0,680.0,Tons,2024-03-01
+Warora APMC Mandi,Chandrapur,Warora,Warora,Paddy,HMT Paddy,Quintal,2400.0,2900.0,2650.0,420.0,Tons,2024-03-01
+Bhandara APMC Paddy Yard,Bhandara,Sakoli,Sakoli,Paddy,Wada Kolam,Quintal,2800.0,3400.0,3100.0,780.0,Tons,2024-03-01
+Gondia APMC Grain Yard,Gondia,Tiroda,Tiroda,Paddy,Chinoor / Kolam,Quintal,2900.0,3500.0,3200.0,920.0,Tons,2024-03-01
+Gadchiroli APMC Mandi,Gadchiroli,Armori,Armori,Paddy,Raw Rice,Quintal,2300.0,2750.0,2500.0,380.0,Tons,2024-03-01
+Ratnagiri APMC Mango Mandi,Ratnagiri,Chiplun,Khed,Alphonso Mango,Grade A,Dozen,800.0,1500.0,1100.0,180.0,Tons,2024-03-01
+Kudal APMC Mandi,Sindhudurg,Kudal,Kudal,Cashew Nut,Raw Cashew,Quintal,11000.0,13500.0,12200.0,120.0,Tons,2024-03-01
+Mahad APMC Mandi,Raigad,Mahad,Birwadi,Rice,Coarse,Quintal,2200.0,2600.0,2400.0,95.0,Tons,2024-03-01
+Palghar APMC Mandi,Palghar,Dahanu,Vangaon,Chickoo,Grade 1,Quintal,2100.0,2800.0,2450.0,210.0,Tons,2024-03-01
+Kalyan Bhiwandi APMC Mandi,Thane,Bhiwandi,Padgha,Rice,Wada Kolam,Quintal,3100.0,3700.0,3400.0,380.0,Tons,2024-03-01
+Vashi APMC Navi Mumbai,Mumbai Suburban,Kurla,Taloja Periurban,Vegetables,Mixed Green,Quintal,1800.0,2600.0,2200.0,1450.0,Tons,2024-03-01

@@ -1,0 +1,7 @@
+district_name,taluka_name,village_name,year,population_total,male_population,female_population,households,working_population,literacy_rate
+Pune,Haveli,Wadgaon Sheri,2021,25000,13000,12000,5000,10000,85.5
+Pune,Haveli,Uruli Kanchan,2021,30000,15500,14500,6000,12000,82.0
+Nashik,Niphad,Ozar,2021,45000,23000,22000,9000,18000,80.0
+Satara,Satara,Vaduth,2021,8000,4100,3900,1600,3200,88.0
+Solapur,Pandharpur,Bhalwani,2021,12000,6200,5800,2400,4800,75.0
+Pune,Haveli,InvalidRow,not_a_number,1000,500,500,200,400,70.0

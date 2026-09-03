@@ -1,0 +1,19 @@
+=== DOCUMENT METADATA ===
+TITLE: PMFME Official Operational Guidelines 2024
+SOURCE_NAME: Ministry of Food Processing Industries (MoFPI)
+SOURCE_URL: https://pmfme.mofpi.gov.in/guidelines
+DOCUMENT_TYPE: official_guidelines
+LANGUAGE: en
+VERSION: 2024.1
+EFFECTIVE_FROM: 2024-01-01
+EFFECTIVE_UNTIL: null
+=== END METADATA ===
+
+SECTION: 1. Scheme Scope and Funding Pattern
+The PM Formalisation of Micro Food Processing Enterprises (PMFME) scheme provides financial, technical, and business support for micro food processing enterprises. Under the scheme, individual micro food processing units are eligible for credit-linked capital subsidy at 35% of the eligible project cost with a maximum ceiling of Rs. 10 Lakh per unit.
+
+SECTION: 2. Beneficiary Contribution and Loan Pattern
+The beneficiary contribution must be a minimum of 10% of the project cost, with the remaining 90% funded through bank credit. Eligible micro units include individual entrepreneurs, Farmer Producer Organizations (FPOs), Self Help Groups (SHGs), and Producer Cooperatives engaged in food processing activities (e.g. dairy processing, fruits/vegetable processing, grain milling, and jaggery manufacturing).
+
+SECTION: 3. One District One Product (ODOP) Focus
+The scheme adopts the One District One Product (ODOP) approach to reap benefits of scale in procurement of inputs, common services, and marketing of products. Units manufacturing ODOP products get priority in credit link and subsidy approval. In Maharashtra, prominent ODOP products include Grapes (Nashik), Sugarcane/Jaggery (Kolhapur), Orange (Nagpur), Banana (Jalgaon), and Dairy (Pune/Kolhapur).

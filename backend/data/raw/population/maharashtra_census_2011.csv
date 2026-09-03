@@ -1,0 +1,54 @@
+district_name,taluka_name,village_name,year,population_total,male_population,female_population,households,working_population,literacy_rate
+Pune,Haveli,Wagholi,2011,24158,12890,11268,5240,10850,83.4
+Pune,Haveli,Uruli Kanchan,2011,30250,15820,14430,6510,13100,81.2
+Pune,Baramati,Malegaon Bk,2011,18940,9850,9090,3980,8450,79.8
+Pune,Khed,Chakan,2011,41680,22410,19270,9120,18500,84.6
+Satara,Satara,Vaduth,2011,8420,4310,4110,1720,3850,88.2
+Satara,Karad,Umbraj,2011,14250,7320,6930,2950,5980,86.5
+Sangli,Miraj,Budhgaon,2011,11840,6080,5760,2480,4920,84.1
+Sangli,Walwa,Islampur,2011,48320,24910,23410,9850,19800,85.9
+Kolhapur,Karveer,Gokul Shirgaon,2011,15640,8190,7450,3310,6950,81.9
+Kolhapur,Kagal,Kagal,2011,38150,19710,18440,8050,16200,83.1
+Solapur,Pandharpur,Bhalwani,2011,8940,4650,4290,1850,3890,74.1
+Solapur,Barshi,Vairag,2011,24180,12510,11670,5120,10200,76.9
+Ahilyanagar,Rahata,Shirdi,2011,36240,18910,17330,7610,14800,81.5
+Ahilyanagar,Sangamner,Ghumari,2011,6840,3520,3320,1380,2950,78.2
+Nashik,Niphad,Ozar,2011,51290,26840,24450,10950,21400,82.7
+Nashik,Niphad,Pimpalgaon Baswant,2011,41560,21710,19850,8840,17900,80.5
+Nashik,Sinnar,Musalgaon,2011,12450,6520,5930,2610,5820,76.4
+Jalgaon,Raver,Khiroda,2011,7920,4080,3840,1620,3450,79.5
+Jalgaon,Bhusawal,Varangaon,2011,28450,14680,13770,5840,11200,82.1
+Dhule,Shirpur,Boradi,2011,11420,5910,5510,2310,4820,71.2
+Nandurbar,Shahada,Kheddigar,2011,5840,3010,2830,1180,2650,62.4
+Chhatrapati Sambhajinagar,Paithan,Paithan,2011,41530,21490,20040,8620,16500,77.3
+Chhatrapati Sambhajinagar,Gangapur,Gangapur,2011,22480,11720,10760,4730,9400,75.8
+Jalna,Ambad,Ghansawangi,2011,14820,7680,7140,2980,6320,72.9
+Parbhani,Gangakhed,Gangakhed,2011,34890,17920,16970,6950,13900,73.5
+Hingoli,Kalamnuri,Kalamnuri,2011,22150,11450,10700,4510,9150,74.8
+Nanded,Mukhed,Mukhed,2011,28960,14980,13980,5940,11800,72.6
+Nanded,Degloor,Degloor,2011,32450,16780,15670,6580,13200,75.1
+Latur,Ausa,Killari,2011,13680,7050,6630,2810,5780,74.5
+Beed,Parli,Parli Vaijnath,2011,48920,25210,23710,9840,19400,78.2
+Dharashiv,Tuljapur,Naldurg,2011,18420,9510,8910,3780,7510,76.1
+Nagpur,Hingna,Hingna,2011,32410,16950,15460,7180,13800,85.2
+Nagpur,Umred,Umred,2011,53920,27740,26180,11940,21900,83.9
+Wardha,Hinganghat,Hinganghat,2011,42850,22100,20750,9120,17400,84.1
+Buldhana,Khamgaon,Shegaon,2011,57840,29810,28030,12150,22800,85.6
+Akola,Murtizapur,Murtizapur,2011,38450,19820,18630,8120,15600,86.2
+Washim,Karanja,Karanja Lad,2011,29840,15380,14460,6180,12100,83.4
+Amravati,Achalpur,Paratwada,2011,51420,26580,24840,11180,20500,86.4
+Amravati,Morshi,Warud,2011,34150,17620,16530,7240,13850,87.1
+Yavatmal,Pusad,Pusad,2011,41850,21620,20230,8940,16900,81.4
+Chandrapur,Warora,Warora,2011,36420,18810,17610,7840,14750,83.8
+Bhandara,Sakoli,Sakoli,2011,14250,7310,6940,2980,5910,85.1
+Gondia,Tiroda,Tiroda,2011,22840,11780,11060,4820,9350,86.9
+Gadchiroli,Armori,Armori,2011,16840,8650,8190,3580,7210,81.2
+Ratnagiri,Chiplun,Khed,2011,15420,7890,7530,3290,6280,82.4
+Ratnagiri,Lanja,Lanja,2011,9850,5020,4830,2120,4150,81.8
+Sindhudurg,Kudal,Kudal,2011,16820,8610,8210,3610,6840,85.9
+Sindhudurg,Kankavli,Kankavli,2011,14950,7680,7270,3210,6050,86.4
+Raigad,Mahad,Birwadi,2011,8940,4610,4330,1920,3810,80.1
+Raigad,Pen,Wadkhal,2011,11250,5810,5440,2410,4780,82.5
+Palghar,Dahanu,Vangaon,2011,12840,6620,6220,2740,5410,72.4
+Thane,Bhiwandi,Padgha,2011,18920,9810,9110,4020,7980,81.1
+Mumbai Suburban,Kurla,Taloja Periurban,2011,48500,25800,22700,10500,21200,88.4

@@ -1,0 +1,7 @@
+district_name,taluka_name,village_name,crop_name,crop_category,cultivated_area,production,production_unit,irrigated_area,year,season
+Pune,Haveli,Wadgaon Sheri,Onion,Vegetables,100,500,Tons,80,2021,Rabi
+Pune,Haveli,Uruli Kanchan,Sugarcane,Cash Crop,250,20000,Tons,250,2021,Annual
+Nashik,Niphad,Ozar,Grapes,Fruits,400,8000,Tons,380,2021,Annual
+Satara,Satara,Vaduth,Bajra,Cereals,150,300,Tons,50,2021,Kharif
+Solapur,Pandharpur,Bhalwani,Jowar,Cereals,300,450,Tons,100,2021,Rabi
+Pune,Haveli,Wadgaon Sheri,,Vegetables,100,500,Tons,80,2021,Rabi

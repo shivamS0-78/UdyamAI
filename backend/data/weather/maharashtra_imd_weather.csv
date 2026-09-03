@@ -1,0 +1,39 @@
+district_name,taluka_name,village_name,date,rainfall_mm,temperature_min,temperature_max,drought_indicator
+Pune,Haveli,Wagholi,2023-07-15,45.2,22.5,28.4,False
+Pune,Haveli,Wagholi,2023-11-20,0.0,14.5,29.2,False
+Satara,Satara,Vaduth,2023-07-15,85.4,21.0,26.8,False
+Sangli,Miraj,Budhgaon,2023-07-15,38.2,22.0,29.5,False
+Kolhapur,Karveer,Gokul Shirgaon,2023-07-15,112.5,21.0,26.5,False
+Solapur,Pandharpur,Bhalwani,2023-07-15,12.0,23.5,32.0,False
+Solapur,Pandharpur,Bhalwani,2023-11-20,0.0,16.2,32.5,True
+Ahilyanagar,Rahata,Shirdi,2023-07-15,22.4,22.8,30.5,False
+Nashik,Niphad,Ozar,2023-07-15,28.5,21.8,27.0,False
+Jalgaon,Raver,Khiroda,2023-07-15,42.1,24.2,31.8,False
+Dhule,Shirpur,Boradi,2023-07-15,31.0,23.8,31.0,False
+Nandurbar,Shahada,Kheddigar,2023-07-15,55.0,23.0,30.2,False
+Chhatrapati Sambhajinagar,Paithan,Paithan,2023-07-15,18.2,23.1,31.2,False
+Chhatrapati Sambhajinagar,Paithan,Paithan,2023-11-20,0.0,14.8,30.8,True
+Jalna,Ambad,Ghansawangi,2023-07-15,15.8,23.4,31.5,False
+Parbhani,Gangakhed,Gangakhed,2023-07-15,28.4,23.9,32.1,False
+Hingoli,Kalamnuri,Kalamnuri,2023-07-15,34.2,23.5,31.2,False
+Nanded,Mukhed,Mukhed,2023-07-15,42.0,23.8,30.2,False
+Latur,Ausa,Killari,2023-07-15,21.5,23.2,31.0,False
+Beed,Parli,Parli Vaijnath,2023-07-15,14.2,24.0,32.8,True
+Dharashiv,Tuljapur,Naldurg,2023-07-15,16.8,23.5,31.9,False
+Nagpur,Hingna,Hingna,2023-07-15,68.4,24.0,30.5,False
+Wardha,Hinganghat,Hinganghat,2023-07-15,72.1,23.8,30.2,False
+Buldhana,Khamgaon,Shegaon,2023-07-15,38.5,23.5,31.0,False
+Akola,Murtizapur,Murtizapur,2023-07-15,41.2,24.0,31.5,False
+Washim,Karanja,Karanja Lad,2023-07-15,36.8,23.8,31.2,False
+Amravati,Achalpur,Paratwada,2023-07-15,54.0,23.0,29.8,False
+Yavatmal,Pusad,Pusad,2023-07-15,62.4,23.5,30.5,False
+Chandrapur,Warora,Warora,2023-07-15,88.2,24.2,29.8,False
+Bhandara,Sakoli,Sakoli,2023-07-15,95.4,23.8,29.2,False
+Gondia,Tiroda,Tiroda,2023-07-15,108.2,23.5,28.8,False
+Gadchiroli,Armori,Armori,2023-07-15,124.5,23.2,28.5,False
+Ratnagiri,Chiplun,Khed,2023-07-15,185.0,22.0,26.2,False
+Sindhudurg,Kudal,Kudal,2023-07-15,210.4,21.8,25.8,False
+Raigad,Mahad,Birwadi,2023-07-15,165.2,22.4,26.8,False
+Palghar,Dahanu,Vangaon,2023-07-15,142.8,23.0,27.5,False
+Thane,Bhiwandi,Padgha,2023-07-15,128.4,23.2,28.0,False
+Mumbai Suburban,Kurla,Taloja Periurban,2023-07-15,115.0,23.5,28.5,False

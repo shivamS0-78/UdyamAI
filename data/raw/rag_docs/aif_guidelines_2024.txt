@@ -1,0 +1,20 @@
+=== DOCUMENT METADATA ===
+Title: Agriculture Infrastructure Fund Guidelines 2024
+Source_Name: Ministry of Agriculture & Farmers Welfare
+Source_URL: https://agriinfra.dac.gov.in
+Document_Type: official_guidelines
+Language: en
+Effective_From: 2024-01-01
+=== END METADATA ===
+
+SECTION: 1. Objective of AIF
+The Agriculture Infrastructure Fund (AIF) aims to provide medium-long term debt financing facility for investment in viable projects for post-harvest management infrastructure and community farming assets through interest subvention and financial support.
+
+SECTION: 2. Financial Benefits & Credit Terms
+- Interest Subvention: All loans under this financing facility will have interest subvention of 3% per annum up to a limit of Rs. 2 Crores. Subvention will be available for a maximum period of 7 years.
+- Credit Guarantee: Credit guarantee coverage will be available for eligible borrowers under CGTMSE scheme for loans up to Rs. 2 Crores.
+- Moratorium: Moratorium for repayment under this financing facility may vary minimum 6 months and maximum 2 years.
+- Project Cost & Financing: 90% loan component with 10% promoter contribution.
+
+SECTION: 3. Eligible Infrastructure Projects
+Post-harvest management infrastructure projects including: Supply chain services, warehouses, silos, pack-houses, cold chains, sorting and grading units, primary processing centers, organic inputs production units, and smart agriculture infrastructure.

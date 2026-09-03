@@ -1,0 +1,7 @@
+district_name,taluka_name,village_name,animal_type,animal_count,milk_production,milk_production_unit,year
+Pune,Haveli,Wadgaon Sheri,Cattle,1200,9600,Liters/Day,2019
+Pune,Haveli,Wadgaon Sheri,Buffalo,800,7200,Liters/Day,2019
+Nashik,Niphad,Ozar,Cattle,950,6650,Liters/Day,2019
+Nashik,Niphad,Ozar,Goat,700,0,Liters/Day,2019
+Satara,Satara,Vaduth,Cattle,1500,12000,Liters/Day,2019
+Pune,Haveli,Wadgaon Sheri,,100,0,Liters/Day,2019

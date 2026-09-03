@@ -1,0 +1,47 @@
+district_name,taluka_name,village_name,business_name,category_name,address,latitude,longitude
+Pune,Haveli,Wagholi,Gokul Dairy Collection Centre,Dairy Processing & Products,Gat No 124 Wagholi Nagar Road,18.5801,73.9825
+Pune,Haveli,Wagholi,Shraddha Agro Food Processing,Agro-Processing & Food Manufacturing,Gat No 142 Wagholi,18.5780,73.9800
+Pune,Haveli,Uruli Kanchan,Kanchan Agro Cold Storage,Cold Storage & Logistics,Uruli Station Road,18.4795,74.0145
+Pune,Baramati,Malegaon Bk,Baramati Cattle Feed & Dairy Unit,Animal Feed & Dairy Processing,Industrial Estate Baramati,18.1520,74.5795
+Pune,Khed,Chakan,Chakan Auto Engineering Services,Engineering & Repair Workshop,Phase 2 MIDC Chakan,18.7620,73.8590
+Satara,Satara,Vaduth,Satara Agro Ginger Processing,Agro-Processing & Food Manufacturing,Vaduth Road,17.7018,74.0325
+Satara,Karad,Umbraj,Karad Sugar & Co-gen Mill,Agro-Processing & Food Manufacturing,NH 48 Umbraj,17.4095,74.1108
+Sangli,Miraj,Budhgaon,Sangli Turmeric Powdering & Spice Processing,Agro-Processing & Food Manufacturing,MIDC Miraj,16.8855,74.6125
+Sangli,Walwa,Islampur,Rajarambapu Dairy Co-op,Dairy Processing & Products,Islampur Station Road,17.0545,74.2675
+Kolhapur,Karveer,Gokul Shirgaon,Gokul Cooperative Dairy Chilling Plant,Dairy Processing & Products,MIDC Gokul Shirgaon,16.6460,74.2620
+Solapur,Pandharpur,Bhalwani,Pandharpur Dal & Processing Mill,Agro-Processing & Food Manufacturing,Station Road Bhalwani,17.6795,75.3215
+Solapur,Barshi,Vairag,Barshi Oil Extraction & Pulses Unit,Agro-Processing & Food Manufacturing,Barshi Road,17.9625,75.8345
+Ahilyanagar,Rahata,Shirdi,Shirdi Food & Confectionery Cluster,Agro-Processing & Food Manufacturing,Temple Road Shirdi,19.7650,74.4768
+Ahilyanagar,Sangamner,Ghumari,Sangamner Milk Producers Co-op,Dairy Processing & Products,Sangamner MIDC,19.5785,74.2145
+Nashik,Niphad,Ozar,Sahyadri Farmer Producer Co Dairy,Dairy Processing & Products,Ozar Airport Road,20.0715,74.0615
+Nashik,Niphad,Pimpalgaon Baswant,Pimpalgaon Grape Processing & Packhouse,Agro-Processing & Food Manufacturing,NH 60 Pimpalgaon,20.1710,73.9810
+Jalgaon,Raver,Khiroda,Jalgaon Banana Fiber & Processing Unit,Agro-Processing & Food Manufacturing,Raver Road,21.1895,75.9235
+Dhule,Shirpur,Boradi,Shirpur Textile & Spinning Cluster,Textile & Garment Manufacturing,MIDC Shirpur,21.3215,74.9125
+Nandurbar,Shahada,Kheddigar,Shahada Tribal Agro Processing,Agro-Processing & Food Manufacturing,Shahada Road,21.5435,74.4785
+Chhatrapati Sambhajinagar,Paithan,Paithan,Paithani Saree & Handloom Cooperative,Textile & Garment Manufacturing,Paithan Market Yard,19.4795,75.3865
+Jalna,Ambad,Ghansawangi,Jalna Seed Processing & Cold Store,Agro-Processing & Food Manufacturing,MIDC Jalna,19.5125,75.8765
+Parbhani,Gangakhed,Gangakhed,Parbhani Cotton Ginning Unit,Textile & Garment Manufacturing,Station Road,18.9645,76.7515
+Hingoli,Kalamnuri,Kalamnuri,Hingoli Turmeric & Spice Processing,Agro-Processing & Food Manufacturing,Kalamnuri Road,19.6675,77.0175
+Nanded,Mukhed,Mukhed,Nanded Agro Oilseed Mill,Agro-Processing & Food Manufacturing,MIDC Nanded,18.7172,77.3672
+Latur,Ausa,Killari,Latur Pulse Milling Cluster,Agro-Processing & Food Manufacturing,MIDC Latur,18.0515,76.5825
+Beed,Parli,Parli Vaijnath,Parli Thermal Power Auxiliary Engineering,Engineering & Repair Workshop,Parli Industrial Area,18.8485,76.5325
+Dharashiv,Tuljapur,Naldurg,Dharashiv Soyabean Processing Unit,Agro-Processing & Food Manufacturing,Tuljapur Road,17.8185,76.2985
+Nagpur,Hingna,Hingna,Orange Processing & Juice Unit,Agro-Processing & Food Manufacturing,MIDC Hingna Road,21.0680,78.9680
+Wardha,Hinganghat,Hinganghat,Wardha Cotton Spinning Mill,Textile & Garment Manufacturing,Hinganghat MIDC,20.5515,78.8355
+Buldhana,Khamgaon,Shegaon,Buldhana Oil & Solvent Extractors,Agro-Processing & Food Manufacturing,Khamgaon Road,20.7935,76.6915
+Akola,Murtizapur,Murtizapur,Akola Dal Mill Cluster,Agro-Processing & Food Manufacturing,MIDC Akola,20.7325,77.3615
+Washim,Karanja,Karanja Lad,Washim Soyabean Solvent Unit,Agro-Processing & Food Manufacturing,Karanja Road,20.4815,77.4895
+Amravati,Achalpur,Paratwada,Achalpur Cotton Ginning & Pressing,Textile & Garment Manufacturing,Paratwada Achalpur Road,21.2895,77.5125
+Amravati,Morshi,Warud,Warud Orange Cold Storage & Juice Plant,Cold Storage & Logistics,Warud MIDC,21.4675,78.0025
+Yavatmal,Pusad,Pusad,Yavatmal Textile & Ginning Co-op,Textile & Garment Manufacturing,Pusad Road,19.9125,77.5785
+Chandrapur,Warora,Warora,Warora Rice Mill & Processing,Agro-Processing & Food Manufacturing,Warora MIDC,20.2315,79.0025
+Bhandara,Sakoli,Sakoli,Bhandara Organic Rice Processing Cluster,Agro-Processing & Food Manufacturing,Sakoli Road,21.0835,79.9895
+Gondia,Tiroda,Tiroda,Gondia Premium Rice Mill Cluster,Agro-Processing & Food Manufacturing,MIDC Gondia,21.4115,79.9325
+Gadchiroli,Armori,Armori,Gadchiroli Forest & Bamboo Craft Cluster,Forest Products & Agro-Forestry,Armori Road,20.4615,79.9815
+Ratnagiri,Chiplun,Khed,Ratnagiri Mango Canning & Processing,Agro-Processing & Food Manufacturing,Khed MIDC,17.7125,73.3895
+Ratnagiri,Lanja,Lanja,Lanja Cashew Processing Co-op,Agro-Processing & Food Manufacturing,Lanja Bazaar,16.8535,73.5515
+Sindhudurg,Kudal,Kudal,Sindhudurg Fruit Processing & Cashew Cluster,Agro-Processing & Food Manufacturing,Kudal MIDC,16.0125,73.6895
+Raigad,Mahad,Birwadi,Mahad Marine & Chemical Logistics,Cold Storage & Logistics,MIDC Mahad,18.0895,73.4215
+Palghar,Dahanu,Vangaon,Dahanu Chickoo Processing Unit,Agro-Processing & Food Manufacturing,Dahanu Road,19.8915,72.7125
+Thane,Bhiwandi,Padgha,Bhiwandi Textile Powerloom & Logistics Park,Textile & Garment Manufacturing,Padgha Road,19.3425,73.1515
+Mumbai Suburban,Kurla,Taloja Periurban,Taloja Food & Cold Chain Hub,Cold Storage & Logistics,MIDC Taloja,19.0625,73.1125

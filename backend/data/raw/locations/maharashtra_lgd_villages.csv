@@ -1,0 +1,54 @@
+district_name,taluka_name,gram_panchayat_name,village_name,state,lgd_code,pin_code,latitude,longitude
+Pune,Haveli,Wagholi GP,Wagholi,Maharashtra,50010101,412207,18.5793,73.9814
+Pune,Haveli,Uruli Kanchan GP,Uruli Kanchan,Maharashtra,50010102,412202,18.4789,74.0135
+Pune,Baramati,Malegaon GP,Malegaon Bk,Maharashtra,50010201,413115,18.1512,74.5784
+Pune,Khed,Chakan GP,Chakan,Maharashtra,50010301,410501,18.7612,73.8584
+Satara,Satara,Vaduth GP,Vaduth,Maharashtra,50020101,415011,17.7012,74.0321
+Satara,Karad,Umbraj GP,Umbraj,Maharashtra,50020201,415109,17.4089,74.1102
+Sangli,Miraj,Budhgaon GP,Budhgaon,Maharashtra,50030101,416410,16.8850,74.6120
+Sangli,Walwa,Islampur GP,Islampur,Maharashtra,50030201,415409,17.0540,74.2670
+Kolhapur,Karveer,Gokul Shirgaon GP,Gokul Shirgaon,Maharashtra,50040101,416234,16.6450,74.2610
+Kolhapur,Kagal,Kagal GP,Kagal,Maharashtra,50040201,416216,16.5810,74.3160
+Solapur,Pandharpur,Bhalwani GP,Bhalwani,Maharashtra,50050101,413304,17.6789,75.3210
+Solapur,Barshi,Vairag GP,Vairag,Maharashtra,50050201,413402,17.9620,75.8340
+Ahilyanagar,Rahata,Shirdi GP,Shirdi,Maharashtra,50060101,423109,19.7645,74.4762
+Ahilyanagar,Sangamner,Ghumari GP,Ghumari,Maharashtra,50060201,422605,19.5780,74.2140
+Nashik,Niphad,Ozar GP,Ozar,Maharashtra,50110101,422206,20.0700,74.0600
+Nashik,Niphad,Pimpalgaon GP,Pimpalgaon Baswant,Maharashtra,50110102,422209,20.1700,73.9800
+Nashik,Sinnar,Musalgaon GP,Musalgaon,Maharashtra,50110201,422112,19.8500,74.0100
+Jalgaon,Raver,Khiroda GP,Khiroda,Maharashtra,50120101,425503,21.1890,75.9230
+Jalgaon,Bhusawal,Varangaon GP,Varangaon,Maharashtra,50120201,425305,21.0180,75.9010
+Dhule,Shirpur,Boradi GP,Boradi,Maharashtra,50130101,425428,21.3210,74.9120
+Nandurbar,Shahada,Kheddigar GP,Kheddigar,Maharashtra,50140101,425409,21.5430,74.4780
+Chhatrapati Sambhajinagar,Paithan,Paithan GP,Paithan,Maharashtra,50210101,431107,19.4781,75.3852
+Chhatrapati Sambhajinagar,Gangapur,Gangapur GP,Gangapur,Maharashtra,50210201,431109,19.6978,75.0069
+Jalna,Ambad,Ghansawangi GP,Ghansawangi,Maharashtra,50220101,431209,19.5120,75.8760
+Parbhani,Gangakhed,Gangakhed GP,Gangakhed,Maharashtra,50230101,431514,18.9640,76.7510
+Hingoli,Kalamnuri,Kalamnuri GP,Kalamnuri,Maharashtra,50240101,431702,19.6670,77.0170
+Nanded,Mukhed,Mukhed GP,Mukhed,Maharashtra,50250101,431715,18.7167,77.3667
+Nanded,Degloor,Degloor GP,Degloor,Maharashtra,50250201,431717,18.5520,77.5810
+Latur,Ausa,Killari GP,Killari,Maharashtra,50260101,413516,18.0510,76.5820
+Beed,Parli,Parli Vaijnath GP,Parli Vaijnath,Maharashtra,50270101,431515,18.8480,76.5320
+Dharashiv,Tuljapur,Naldurg GP,Naldurg,Maharashtra,50280101,413602,17.8180,76.2980
+Nagpur,Hingna,Hingna GP,Hingna,Maharashtra,50310101,441110,21.0667,78.9667
+Nagpur,Umred,Umred GP,Umred,Maharashtra,50310201,441203,20.8500,79.3300
+Wardha,Hinganghat,Hinganghat GP,Hinganghat,Maharashtra,50320101,442301,20.5510,78.8350
+Buldhana,Khamgaon,Shegaon GP,Shegaon,Maharashtra,50330101,444203,20.7930,76.6910
+Akola,Murtizapur,Murtizapur GP,Murtizapur,Maharashtra,50340101,444107,20.7320,77.3610
+Washim,Karanja,Karanja Lad GP,Karanja Lad,Maharashtra,50350101,444105,20.4810,77.4890
+Amravati,Achalpur,Paratwada GP,Paratwada,Maharashtra,50360101,444805,21.2890,77.5120
+Amravati,Morshi,Warud GP,Warud,Maharashtra,50360201,444906,21.4670,78.0020
+Yavatmal,Pusad,Pusad GP,Pusad,Maharashtra,50370101,445204,19.9120,77.5780
+Chandrapur,Warora,Warora GP,Warora,Maharashtra,50380101,442907,20.2310,79.0020
+Bhandara,Sakoli,Sakoli GP,Sakoli,Maharashtra,50390101,441802,21.0830,79.9890
+Gondia,Tiroda,Tiroda GP,Tiroda,Maharashtra,50400101,441911,21.4110,79.9320
+Gadchiroli,Armori,Armori GP,Armori,Maharashtra,50410101,441208,20.4610,79.9810
+Ratnagiri,Chiplun,Khed GP,Khed,Maharashtra,50510101,415701,17.7120,73.3890
+Ratnagiri,Lanja,Lanja GP,Lanja,Maharashtra,50510201,415701,16.8530,73.5510
+Sindhudurg,Kudal,Kudal GP,Kudal,Maharashtra,50520101,416520,16.0120,73.6890
+Sindhudurg,Kankavli,Kankavli GP,Kankavli,Maharashtra,50520201,416602,16.2710,73.7120
+Raigad,Mahad,Birwadi GP,Birwadi,Maharashtra,50530101,402302,18.0890,73.4210
+Raigad,Pen,Wadkhal GP,Wadkhal,Maharashtra,50530201,402107,18.6810,73.1020
+Palghar,Dahanu,Vangaon GP,Vangaon,Maharashtra,50540101,401102,19.8910,72.7120
+Thane,Bhiwandi,Padgha GP,Padgha,Maharashtra,50550101,421101,19.3420,73.1510
+Mumbai Suburban,Kurla,Taloja GP,Taloja Periurban,Maharashtra,50560101,410208,19.0620,73.1120

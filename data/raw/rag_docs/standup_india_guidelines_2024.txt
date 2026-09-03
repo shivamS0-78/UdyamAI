@@ -1,0 +1,23 @@
+=== DOCUMENT METADATA ===
+Title: Stand Up India Scheme Guidelines 2024
+Source_Name: SIDBI / Department of Financial Services
+Source_URL: https://www.standupmitra.in
+Document_Type: official_guidelines
+Language: en
+Effective_From: 2024-01-01
+=== END METADATA ===
+
+SECTION: 1. Overview & Objective
+The Stand Up India Scheme facilitates bank loans between 10 Lakhs and 1 Crore to at least one Scheduled Caste (SC) or Scheduled Tribe (ST) borrower and at least one woman borrower per bank branch for setting up a greenfield enterprise. The enterprise may be in manufacturing, services, or the trading sector.
+
+SECTION: 2. Financial Assistance & Terms
+- Project Cost: Min Rs. 10 Lakhs, Max Rs. 1 Crore.
+- Loan Amount: Up to 85% of the project cost inclusive of term loan and working capital.
+- Beneficiary Contribution: Margin money of 15% (can be met in convergence with eligible Central/State schemes).
+- Interest Rate: Lowest applicable rate of the bank for that category, not to exceed (Base Rate / MCLR + 3% + Tenor Premium).
+- Tenure & Repayable: Repayable in 7 years with a maximum moratorium period of 18 months.
+
+SECTION: 3. Eligibility Criteria
+1. SC/ST and/or Women entrepreneurs above 18 years of age.
+2. Loans under the scheme are available for greenfield projects only (first-time venture of the applicant in manufacturing, services, or trading).
+3. In case of non-individual entities, at least 51% of the shareholding and controlling stake should be held by an SC/ST or woman entrepreneur.

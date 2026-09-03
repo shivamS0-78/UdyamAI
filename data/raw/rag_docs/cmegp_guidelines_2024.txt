@@ -1,0 +1,16 @@
+=== DOCUMENT METADATA ===
+TITLE: CMEGP Maharashtra Government Resolution 2024
+SOURCE_NAME: Directorate of Industries, Govt of Maharashtra
+SOURCE_URL: https://gr.maharashtra.gov.in/cmegp
+DOCUMENT_TYPE: government_resolution
+LANGUAGE: en
+VERSION: 2024.1
+EFFECTIVE_FROM: 2024-01-01
+EFFECTIVE_UNTIL: null
+=== END METADATA ===
+
+SECTION: 1. CMEGP Overview and Eligibility
+Chief Minister Employment Generation Programme (CMEGP) is a state-level credit-linked subsidy scheme launched by the Government of Maharashtra to promote micro-enterprises across manufacturing and service sectors. Permanent residents of Maharashtra (Domicile Certificate required) aged between 18 and 45 years (up to 50 years for SC/ST/Women/Ex-Servicemen) are eligible.
+
+SECTION: 2. Financial Limits and Subsidy Rates
+Maximum project cost for manufacturing sector is Rs. 50 Lakhs and for service sector is Rs. 10 Lakhs. Margin money subsidy for rural projects is 25% for general category and 35% for special categories (SC/ST/OBC/Women/Physically Handicapped). For urban projects, subsidy rate is 15% for general category and 25% for special categories. Applicant contribution is 10% for general category and 5% for special category.

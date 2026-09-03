@@ -28,6 +28,8 @@ services:
       - DATABASE_URL=postgresql://udyam_user:udyam_password@database:5432/udyam_db
     ports:
       - "8000:8000"
+    volumes:
+      - ./data/raw:/data/raw
     depends_on:
       database:
         condition: service_healthy

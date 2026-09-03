@@ -63,11 +63,13 @@ class RepaymentSchedule(SQLModel, table=True):
     period_start: date | None = Field(default=None)
     period_end: date | None = Field(default=None)
 
+    opening_balance: float | None = Field(default=None)
     principal_amount: float | None = Field(default=None)
     interest_amount: float | None = Field(default=None)
     payment_amount: float | None = Field(default=None)
     remaining_principal: float | None = Field(default=None)
     is_moratorium: bool = Field(default=False)
+    verification_required: bool = Field(default=False)
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
     # Relationships

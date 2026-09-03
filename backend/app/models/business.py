@@ -55,7 +55,6 @@ class Business(SQLModel, table=True):
 
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     name: str | None = Field(default=None)
-    category: str | None = Field(default=None)
     business_category_id: UUID | None = Field(
         default=None, foreign_key="business_categories.id", nullable=True
     )
@@ -67,7 +66,10 @@ class Business(SQLModel, table=True):
     latitude: float | None = Field(default=None)
     longitude: float | None = Field(default=None)
     geom: Any | None = Field(
-        default=None, sa_column=Column(Geography(geometry_type="POINT", srid=4326), nullable=True)
+        default=None,
+        sa_column=Column(
+            Geography(geometry_type="POINT", srid=4326, spatial_index=False), nullable=True
+        ),
     )
 
     # Provenance fields

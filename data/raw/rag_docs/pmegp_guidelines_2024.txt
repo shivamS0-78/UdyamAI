@@ -1,0 +1,24 @@
+=== DOCUMENT METADATA ===
+TITLE: PMEGP Official Guidelines 2024
+SOURCE_NAME: Khadi and Village Industries Commission (KVIC)
+SOURCE_URL: https://kviconline.gov.in/pmegpeportal/guidelines
+DOCUMENT_TYPE: official_guidelines
+LANGUAGE: en
+VERSION: 2024.1
+EFFECTIVE_FROM: 2024-01-01
+EFFECTIVE_UNTIL: null
+=== END METADATA ===
+
+SECTION: 1. Overview and Scheme Objectives
+The Prime Minister Employment Generation Programme (PMEGP) is a credit-linked subsidy scheme administered by KVIC at the national level and State KVIC Directorates, KVIBs, and DICs at the state level. The scheme aims to generate continuous employment opportunities in rural and urban areas through setting up new self-employment ventures and micro-enterprises.
+
+SECTION: 2. Financial Assistance and Subsidy Pattern
+Under the PMEGP scheme, the financial assistance pattern is divided based on beneficiary category and project location:
+1. General Category Applicants: Beneficiary contribution is 10% of the project cost in rural areas and 10% in urban areas. The rate of margin money subsidy is 25% of the project cost for rural locations and 15% for urban locations.
+2. Special Category Applicants (SC, ST, OBC, Minorities, Women, Ex-Servicemen, Differently-Abled): Beneficiary contribution is 5% of the project cost. The rate of margin money subsidy is 35% of the project cost for rural locations and 25% for urban locations.
+
+SECTION: 3. Project Cost Limits and Eligible Sectors
+The maximum cost of the project/unit admissible under manufacturing sector is Rs. 50 Lakhs. The maximum cost admissible under business/service sector is Rs. 20 Lakhs. The balance amount of project cost is funded by banks as term loan (up to 90% of project cost). Repayment tenure ranges from 3 to 7 years with an initial moratorium period of 6 months.
+
+SECTION: 4. Eligibility Criteria
+Any individual above 18 years of age is eligible to apply. There is no income ceiling for setting up projects under PMEGP. For projects costing above Rs. 10 Lakhs in manufacturing sector and above Rs. 5 Lakhs in business/service sector, beneficiaries must possess at least 8th standard pass educational qualification.

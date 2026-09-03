@@ -1,0 +1,7 @@
+district_name,taluka_name,village_name,date,rainfall_mm,temperature_min,temperature_max,drought_indicator
+Pune,Haveli,Wadgaon Sheri,2021-07-15,45.2,22.5,28.4,False
+Pune,Haveli,Uruli Kanchan,2021-07-15,,22.0,27.8,False
+Nashik,Niphad,Ozar,2021-07-15,28.5,21.8,27.0,False
+Satara,Satara,Vaduth,2021-07-15,65.0,20.5,26.0,False
+Solapur,Pandharpur,Bhalwani,2021-07-15,12.0,23.5,32.0,True
+Pune,Haveli,Wadgaon Sheri,not-a-date,10.0,20.0,30.0,False

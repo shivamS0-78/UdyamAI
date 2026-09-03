@@ -1,0 +1,7 @@
+market_name,district_name,taluka_name,village_name,commodity,commodity_variety,unit,min_price,max_price,modal_price,arrival_quantity,arrival_unit,recorded_date
+Gultekdi APMC,Pune,Haveli,Wadgaon Sheri,Onion,Red,Quintal,1500,2000,1800,100,Tons,2021-07-15
+Gultekdi APMC,Pune,Haveli,Wadgaon Sheri,Tomato,Hybrid,Quintal,1000,1600,1300,50,Tons,2021-07-15
+Pimpalgaon Market,Nashik,Niphad,Ozar,Grapes,Thompson,Quintal,4000,6000,5000,200,Tons,2021-07-15
+Uruli Kanchan Bazaar,Pune,Haveli,Uruli Kanchan,Milk,Cow,Liter,50,55,52,500,Liters,2021-07-15
+Pandharpur APMC,Solapur,Pandharpur,Bhalwani,Jowar,Malkandi,Quintal,2200,2800,2500,80,Tons,2021-07-15
+Gultekdi APMC,Pune,Haveli,Wadgaon Sheri,,Red,Quintal,1500,2000,1800,100,Tons,2021-07-15

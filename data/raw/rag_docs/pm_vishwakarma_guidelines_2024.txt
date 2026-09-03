@@ -1,0 +1,22 @@
+=== DOCUMENT METADATA ===
+Title: PM Vishwakarma Scheme Guidelines 2024
+Source_Name: Ministry of Micro, Small and Medium Enterprises
+Source_URL: https://pmvishwakarma.gov.in
+Document_Type: official_guidelines
+Language: en
+Effective_From: 2024-01-01
+=== END METADATA ===
+
+SECTION: 1. Scheme Vision & Scope
+PM Vishwakarma is a Central Sector Scheme launched to support traditional artisans and craftspeople who work with their hands and tools. The scheme aims to enhance the quality, scale, and reach of products and services of Vishwakarmas and integrate them with domestic and global value chains.
+
+SECTION: 2. Benefits & Credit Support
+- Enterprise Credit: Collateral-free credit support up to Rs 3 Lakhs in two tranches (Tranche 1: Rs 1 Lakh for 18 months; Tranche 2: Rs 2 Lakhs for 30 months).
+- Concessional Interest Rate: Concessional rate of 5% to be charged from beneficiaries, with interest subvention of 8% paid by Ministry of MSME to banks.
+- Skill Verification & Training: Basic training (5-7 days) and Advanced training (15 days or more) with a stipend of Rs 500 per day.
+- Toolkit Incentive: Skill incentive of up to Rs 15,000 in the form of e-vouchers for toolkits.
+
+SECTION: 3. Eligible Trades & Criteria
+1. An artisan or craftsperson working with hands and tools, engaged in one of the 18 family-based traditional trades.
+2. Minimum age of 18 years on the date of registration.
+3. The beneficiary should not have availed loans under similar credit-based schemes (PMEGP, PMEG, MUDRA) in the last 5 years.

@@ -3,7 +3,10 @@ from typing import TYPE_CHECKING, Any, Optional
 from uuid import UUID, uuid4
 
 from sqlalchemy import JSON, Column
+from sqlalchemy import Enum as SQLEnum
 from sqlmodel import Field, Relationship, SQLModel
+
+from app.schemas.common import SchemeMatchStatus
 
 if TYPE_CHECKING:
     from app.models.analysis import AnalysisRun
@@ -48,6 +51,9 @@ class SchemeRule(SQLModel, table=True):
     interest_rate: float | None = Field(default=None)
     tenure_months: int | None = Field(default=None)
     moratorium_months: int | None = Field(default=None)
+    payment_frequency: str | None = Field(default="monthly")
+    moratorium_interest_treatment: str | None = Field(default=None)
+    working_capital_percent: float | None = Field(default=None)
 
     min_age: int | None = Field(default=None)
     max_age: int | None = Field(default=None)
@@ -94,9 +100,12 @@ class SchemeMatch(SQLModel, table=True):
     analysis_run_id: UUID = Field(foreign_key="analysis_runs.id", nullable=False)
     scheme_id: UUID = Field(foreign_key="schemes.id", nullable=False)
 
-    match_status: str = Field(
-        nullable=False
-    )  # potential_match, not_matched, insufficient_information
+    match_status: SchemeMatchStatus = Field(
+        sa_column=Column(
+            SQLEnum(SchemeMatchStatus, values_callable=lambda x: [e.value for e in x]),
+            nullable=False,
+        )
+    )
     match_score: float | None = Field(default=None)
 
     # JSON details

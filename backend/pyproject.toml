@@ -1,6 +1,12 @@
+[project]
+name = "udyamai-backend"
+version = "0.1.0"
+requires-python = ">=3.10"
+
 [tool.ruff]
 target-version = "py311"
 line-length = 100
+
 
 [tool.ruff.lint]
 select = [
@@ -13,6 +19,7 @@ select = [
 ]
 ignore = [
     "E501", # line too long (handled by formatter)
+    "UP017", # allow datetime.timezone.utc
 ]
 
 [tool.ruff.lint.isort]
@@ -24,4 +31,9 @@ extend-immutable-calls = ["fastapi.Depends", "fastapi.params.Depends", "fastapi.
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
+
+[tool.pytest.ini_options]
+markers = [
+    "postgresql_integration: mark test as requiring a live PostgreSQL + pgvector database instance",
+]
 

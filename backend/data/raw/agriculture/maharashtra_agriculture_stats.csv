@@ -1,0 +1,53 @@
+district_name,taluka_name,village_name,crop_name,crop_category,cultivated_area,production,production_unit,irrigated_area,year,season
+Pune,Haveli,Wagholi,Sugarcane,Cash Crop,450.5,38292.5,Tons,410.0,2023,Annual
+Pune,Haveli,Wagholi,Onion,Vegetables,185.0,3330.0,Tons,165.0,2023,Rabi
+Pune,Haveli,Wagholi,Soyabean,Oilseeds,210.0,462.0,Tons,120.0,2023,Kharif
+Pune,Baramati,Malegaon Bk,Sugarcane,Cash Crop,1250.0,112500.0,Tons,1200.0,2023,Annual
+Satara,Satara,Vaduth,Sugarcane,Cash Crop,680.0,61200.0,Tons,650.0,2023,Annual
+Satara,Karad,Umbraj,Sugarcane,Cash Crop,950.0,85500.0,Tons,910.0,2023,Annual
+Sangli,Miraj,Budhgaon,Sugarcane,Cash Crop,820.0,73800.0,Tons,790.0,2023,Annual
+Sangli,Walwa,Islampur,Sugarcane,Cash Crop,1450.0,130500.0,Tons,1400.0,2023,Annual
+Kolhapur,Karveer,Gokul Shirgaon,Sugarcane,Cash Crop,980.0,93100.0,Tons,940.0,2023,Annual
+Solapur,Pandharpur,Bhalwani,Jowar,Cereals,540.0,648.0,Tons,180.0,2023,Rabi
+Solapur,Pandharpur,Bhalwani,Pomegranate,Fruits,420.0,5040.0,Tons,390.0,2023,Annual
+Ahilyanagar,Rahata,Shirdi,Sugarcane,Cash Crop,890.0,80100.0,Tons,850.0,2023,Annual
+Ahilyanagar,Sangamner,Ghumari,Onion,Vegetables,520.0,9880.0,Tons,480.0,2023,Rabi
+Nashik,Niphad,Ozar,Grapes,Fruits,890.0,17800.0,Tons,850.0,2023,Annual
+Nashik,Niphad,Ozar,Onion,Vegetables,620.0,11780.0,Tons,580.0,2023,Rabi
+Nashik,Niphad,Pimpalgaon Baswant,Grapes,Fruits,1150.0,24150.0,Tons,1100.0,2023,Annual
+Jalgaon,Raver,Khiroda,Banana,Fruits,1240.0,49600.0,Tons,1180.0,2023,Annual
+Jalgaon,Bhusawal,Varangaon,Banana,Fruits,980.0,39200.0,Tons,920.0,2023,Annual
+Dhule,Shirpur,Boradi,Cotton,Commercial,750.0,1125.0,Tons,280.0,2023,Kharif
+Nandurbar,Shahada,Kheddigar,Maize,Cereals,620.0,1860.0,Tons,190.0,2023,Kharif
+Chhatrapati Sambhajinagar,Paithan,Paithan,Sweet Lime (Mosambi),Fruits,650.0,7800.0,Tons,610.0,2023,Annual
+Chhatrapati Sambhajinagar,Gangapur,Gangapur,Cotton,Commercial,820.0,1230.0,Tons,250.0,2023,Kharif
+Jalna,Ambad,Ghansawangi,Sweet Lime,Fruits,540.0,6480.0,Tons,490.0,2023,Annual
+Parbhani,Gangakhed,Gangakhed,Soyabean,Oilseeds,890.0,1958.0,Tons,320.0,2023,Kharif
+Hingoli,Kalamnuri,Kalamnuri,Soyabean,Oilseeds,710.0,1562.0,Tons,240.0,2023,Kharif
+Nanded,Mukhed,Mukhed,Soyabean,Oilseeds,780.0,1716.0,Tons,290.0,2023,Kharif
+Nanded,Degloor,Degloor,Cotton,Commercial,690.0,1035.0,Tons,210.0,2023,Kharif
+Latur,Ausa,Killari,Soyabean,Oilseeds,920.0,2024.0,Tons,310.0,2023,Kharif
+Beed,Parli,Parli Vaijnath,Cotton,Commercial,880.0,1320.0,Tons,260.0,2023,Kharif
+Dharashiv,Tuljapur,Naldurg,Soyabean,Oilseeds,650.0,1430.0,Tons,210.0,2023,Kharif
+Nagpur,Hingna,Hingna,Orange,Fruits,720.0,6480.0,Tons,680.0,2023,Annual
+Nagpur,Hingna,Hingna,Cotton,Commercial,340.0,510.0,Tons,120.0,2023,Kharif
+Wardha,Hinganghat,Hinganghat,Cotton,Commercial,1150.0,1725.0,Tons,380.0,2023,Kharif
+Buldhana,Khamgaon,Shegaon,Cotton,Commercial,940.0,1410.0,Tons,290.0,2023,Kharif
+Akola,Murtizapur,Murtizapur,Cotton,Commercial,860.0,1290.0,Tons,270.0,2023,Kharif
+Washim,Karanja,Karanja Lad,Soyabean,Oilseeds,790.0,1738.0,Tons,240.0,2023,Kharif
+Amravati,Achalpur,Paratwada,Cotton,Commercial,910.0,1365.0,Tons,320.0,2023,Kharif
+Amravati,Morshi,Warud,Orange,Fruits,1120.0,10080.0,Tons,1050.0,2023,Annual
+Yavatmal,Pusad,Pusad,Cotton,Commercial,1280.0,1920.0,Tons,390.0,2023,Kharif
+Chandrapur,Warora,Warora,Paddy / Rice,Cereals,850.0,2550.0,Tons,620.0,2023,Kharif
+Bhandara,Sakoli,Sakoli,Paddy / Rice,Cereals,1420.0,4260.0,Tons,1180.0,2023,Kharif
+Gondia,Tiroda,Tiroda,Paddy / Rice,Cereals,1680.0,5040.0,Tons,1420.0,2023,Kharif
+Gadchiroli,Armori,Armori,Paddy / Rice,Cereals,1120.0,3360.0,Tons,890.0,2023,Kharif
+Ratnagiri,Chiplun,Khed,Alphonso Mango,Fruits,820.0,4920.0,Tons,210.0,2023,Annual
+Ratnagiri,Lanja,Lanja,Cashew Nut,Plantation,650.0,1950.0,Tons,150.0,2023,Annual
+Sindhudurg,Kudal,Kudal,Alphonso Mango,Fruits,950.0,5700.0,Tons,280.0,2023,Annual
+Sindhudurg,Kankavli,Kankavli,Cashew Nut,Plantation,780.0,2340.0,Tons,190.0,2023,Annual
+Raigad,Mahad,Birwadi,Rice,Cereals,420.0,1260.0,Tons,290.0,2023,Kharif
+Raigad,Pen,Wadkhal,Rice,Cereals,510.0,1530.0,Tons,340.0,2023,Kharif
+Palghar,Dahanu,Vangaon,Chickoo (Sapota),Fruits,580.0,6960.0,Tons,490.0,2023,Annual
+Thane,Bhiwandi,Padgha,Rice,Cereals,390.0,1170.0,Tons,280.0,2023,Kharif
+Mumbai Suburban,Kurla,Taloja Periurban,Vegetables,Vegetables,180.0,1440.0,Tons,150.0,2023,Kharif

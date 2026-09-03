@@ -73,7 +73,7 @@ CREATE TABLE scheme_matches (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     analysis_run_id UUID NOT NULL REFERENCES analysis_runs(id) ON DELETE CASCADE,
     scheme_id UUID NOT NULL REFERENCES schemes(id) ON DELETE CASCADE,
-    match_status TEXT NOT NULL CHECK (match_status IN ('potential_match', 'not_matched', 'insufficient_information')),
+    match_status TEXT NOT NULL CHECK (match_status IN ('potential_match', 'not_match', 'missing_information', 'verification_required')),
     match_score NUMERIC,
     matched_conditions JSONB,
     failed_conditions JSONB,

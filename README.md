@@ -66,9 +66,16 @@ Ensure you have the following installed on your local machine:
    cp .env.example .env
    ```
 2. Edit `.env` to supply your API keys and configuration parameters:
+   - **`ENV`**: Set to `"production"` in production deployments, or `"development"` / `"test"` for local dev.
    - **`DATABASE_URL`**: DB connection string.
    - **`OPENAI_API_KEY`** or **`GEMINI_API_KEY`**: LLM API tokens for the advisor.
    - **`SECRET_KEY`**: JWT secret for authentication.
+
+> [!IMPORTANT]
+> **Production Security Mandate**:
+> * If **`ENV`** is set to `"production"`, you **must** explicitly supply a strong, custom value for **`SECRET_KEY`** (e.g. generated via `openssl rand -hex 32`). If `SECRET_KEY` is missing in a production environment, the backend will raise a `ValueError` validation error and fail to boot.
+> * In `"development"` or `"test"` modes, the application will fallback to a documented fallback key (`dev_secret_key_fallback`) if `SECRET_KEY` is omitted, though explicit configuration is still highly recommended.
+
 
 ---
 

@@ -1,0 +1,15 @@
+=== DOCUMENT METADATA ===
+Title: PM Formalisation of Micro Food Processing Enterprises Guidelines 2024
+Source_Name: Ministry of Food Processing Industries (MoFPI)
+Source_URL: https://pmfme.mofpi.gov.in
+Document_Type: official_guidelines
+Language: en
+Effective_From: 2024-01-01
+=== END METADATA ===
+
+SECTION: 1. Scheme Scope
+Provides credit-linked capital subsidy for micro food processing enterprises, FPOs, SHGs, and cooperatives to upgrade machinery, packaging, and branding.
+
+SECTION: 2. Subsidy Details
+- Credit-linked Capital Subsidy: 35% of eligible project cost up to a maximum of Rs. 10 Lakhs per unit.
+- Seed Capital for SHGs: Rs. 40,000 per SHG member for working capital and small tools.
