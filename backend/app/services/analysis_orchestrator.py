@@ -338,9 +338,12 @@ class AnalysisOrchestrator:
                     "growth_rate": demand_info.get("growth_rate"),
                 },
                 pricing_indicators={
-                    "average_market_price": pricing_info.get("average_market_price"),
-                    "price_range_min": pricing_info.get("price_range_min"),
-                    "price_range_max": pricing_info.get("price_range_max"),
+                    "average_market_price": pricing_info.get("average_market_price")
+                    or pricing_info.get("average_modal_price"),
+                    "price_range_min": pricing_info.get("price_range_min")
+                    or pricing_info.get("min_modal_price"),
+                    "price_range_max": pricing_info.get("price_range_max")
+                    or pricing_info.get("max_modal_price"),
                 },
             )
 
@@ -605,7 +608,10 @@ class AnalysisOrchestrator:
                     "score": demand_score_val,
                     "level": _demand_level,
                 },
-                pricing_indicators={"average_price": pricing_info.get("average_market_price")},
+                pricing_indicators={
+                    "average_price": pricing_info.get("average_modal_price")
+                    or pricing_info.get("average_market_price")
+                },
                 data_confidence=ai_advice.confidence,
             )
             db.add(db_market_analysis)

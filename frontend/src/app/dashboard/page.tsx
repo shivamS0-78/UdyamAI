@@ -78,7 +78,6 @@ function DashboardContent() {
   const marketScore = feas.market_score != null ? Math.round(feas.market_score) : null;
   const financialScore = feas.financial_score != null ? Math.round(feas.financial_score) : null;
   const competitionScore = feas.competition_score != null ? Math.round(feas.competition_score) : null;
-  const infrastructureScore = feas.infrastructure_score != null ? Math.round(feas.infrastructure_score) : null;
   const riskScore = feas.risk_score != null ? Math.round(feas.risk_score) : null;
 
   const riskLevelKey =
@@ -224,11 +223,10 @@ function DashboardContent() {
             </div>
 
             {/* Score breakdown */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {marketScore != null && <ScoreCard label={t('dash.marketScore')} score={marketScore} />}
               {financialScore != null && <ScoreCard label={t('dash.financialScore')} score={financialScore} />}
               {competitionScore != null && <ScoreCard label={t('dash.competitionScore')} score={competitionScore} />}
-              {infrastructureScore != null && <ScoreCard label="Infrastructure Score" score={infrastructureScore} />}
               {riskScore != null && <ScoreCard label="Risk Profile Index" score={riskScore} />}
             </div>
 
