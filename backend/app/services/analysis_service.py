@@ -3,6 +3,7 @@ from uuid import UUID, uuid4
 from fastapi import HTTPException
 from sqlmodel import Session, select
 
+from app.finance.break_even import calculate_break_even_period
 from app.models.analysis import AIAnalysis, AnalysisRun, FeasibilityAnalysis
 from app.models.business import BusinessCategory
 from app.models.finance import FinancialAnalysis
@@ -464,7 +465,7 @@ class AnalysisService:
             )
 
         # ------------------------------------------------------------------
-        # Enrich fin_data with market-derived estimates when DB values are missing
+        # Enrich fin_data with sector, market & subsidy-driven estimates
         # ------------------------------------------------------------------
         feasible_cost = fin_data.get("feasible_project_cost") or 0.0
         pricing = mkt_data.get("pricing_indicators") or {}
@@ -475,19 +476,78 @@ class AnalysisService:
             or pricing.get("average_price")
         )
 
+        # Sector / category benchmark parameters for micro-enterprises
+        # (rev_ratio: monthly revenue as % of feasible project cost)
+        # (cost_ratio: monthly operating costs as % of monthly revenue)
+        cat_name = (business_data.get("category_name") or "").lower()
+        cat_desc = (business_data.get("description") or "").lower()
+        text_context = f"{cat_name} {cat_desc}"
+
+        if any(
+            k in text_context
+            for k in ["retail", "grocery", "kirana", "shop", "store", "trading", "mart"]
+        ):
+            bench = {"rev_ratio": 0.35, "cost_ratio": 0.78}
+        elif any(
+            k in text_context
+            for k in ["dairy", "milk", "cattle", "livestock", "poultry", "goat", "animal"]
+        ):
+            bench = {"rev_ratio": 0.25, "cost_ratio": 0.65}
+        elif any(
+            k in text_context
+            for k in ["service", "repair", "salon", "tailor", "mechanic", "digital"]
+        ):
+            bench = {"rev_ratio": 0.28, "cost_ratio": 0.48}
+        elif any(
+            k in text_context
+            for k in ["manufactur", "process", "mill", "oil", "textile", "craft", "fabric"]
+        ):
+            bench = {"rev_ratio": 0.20, "cost_ratio": 0.58}
+        elif any(
+            k in text_context
+            for k in ["food", "hotel", "canteen", "restaurant", "bakery", "sweet", "snack"]
+        ):
+            bench = {"rev_ratio": 0.32, "cost_ratio": 0.70}
+        else:
+            bench = {"rev_ratio": 0.24, "cost_ratio": 0.62}
+
+        # Market demand adjustment (score 0-100)
+        demand_ind = mkt_data.get("demand_indicators") or {}
+        raw_demand_score = demand_ind.get("score") or demand_ind.get("demand_score")
+        if raw_demand_score is not None:
+            try:
+                ds_val = float(raw_demand_score)
+                demand_mult = 0.85 + (ds_val / 100.0) * 0.30
+            except (ValueError, TypeError):
+                demand_mult = 1.0
+        else:
+            demand_mult = 1.0
+
+        # Competition density adjustment
+        comp_count = comp_data.get("competitor_count")
+        if comp_count is not None:
+            try:
+                cc_val = float(comp_count)
+                comp_mult = max(0.85, min(1.10, 1.05 - (cc_val * 0.02)))
+            except (ValueError, TypeError):
+                comp_mult = 1.0
+        else:
+            comp_mult = 1.0
+
+        market_mult = round(demand_mult * comp_mult, 3)
+
         est_monthly_rev = fin_data.get("monthly_revenue")
         if est_monthly_rev is None and feasible_cost > 0:
-            # Revenue estimate: target_customers * avg_price * purchase_freq * conversion
             if target_customers > 0 and avg_price and avg_price > 0:
-                est_monthly_rev = round(target_customers * float(avg_price) * 0.3 * 4, 2)
+                est_monthly_rev = round(
+                    target_customers * float(avg_price) * 0.3 * 4 * comp_mult, 2
+                )
             else:
-                # Fallback: 20% of feasible project cost per month (micro-enterprise benchmark)
-                est_monthly_rev = round(feasible_cost * 0.20, 2)
+                est_monthly_rev = round(feasible_cost * bench["rev_ratio"] * market_mult, 2)
 
         est_monthly_cost = fin_data.get("monthly_operating_cost")
         if est_monthly_cost is None and est_monthly_rev is not None:
-            # Operating cost ~60% of revenue (standard micro-enterprise ratio)
-            est_monthly_cost = round(est_monthly_rev * 0.60, 2)
+            est_monthly_cost = round(est_monthly_rev * bench["cost_ratio"], 2)
 
         est_monthly_profit = fin_data.get("monthly_profit")
         if (
@@ -504,7 +564,11 @@ class AnalysisService:
             and est_monthly_profit
             and est_monthly_profit > 0
         ):
-            est_break_even = round(feasible_cost / est_monthly_profit, 1)
+            est_break_even = calculate_break_even_period(
+                project_cost=feasible_cost,
+                monthly_profit=est_monthly_profit,
+                subsidy_amount=max_subsidy_est,
+            )
 
         est_repayment_capacity = fin_data.get("repayment_capacity")
         est_emi = fin_data.get("monthly_emi") or 0.0

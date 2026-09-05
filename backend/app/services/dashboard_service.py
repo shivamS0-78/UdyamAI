@@ -10,9 +10,9 @@ user:
 
 from uuid import UUID
 
-from sqlalchemy import func, select
+from sqlalchemy import func
 from sqlalchemy.orm import selectinload
-from sqlmodel import Session
+from sqlmodel import Session, select
 
 from app.models.analysis import AnalysisRun, FeasibilityAnalysis
 from app.models.budget import Budget
