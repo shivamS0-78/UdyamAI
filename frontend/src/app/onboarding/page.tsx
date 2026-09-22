@@ -23,6 +23,8 @@ export default function OnboardingPage() {
   const globalLanguage = useLanguageStore((s) => s.language);
 
   // Location
+  const [stateCode, setStateCode] = useState("MH");
+  const [stateName, setStateName] = useState("Maharashtra");
   const [districtId, setDistrictId] = useState("");
   const [talukaId, setTalukaId] = useState("");
   const [villageId, setVillageId] = useState("");
@@ -78,6 +80,8 @@ export default function OnboardingPage() {
 
   // Demo sample scenario button using verified seeded data from Maharashtra database
   const handleDemo = () => {
+    setStateCode("MH");
+    setStateName("Maharashtra");
     setDistrictId("624a9c93-78e1-4f68-b79b-0b865a45c1bf");
     setDistrictName("Pune");
     setTalukaId("3158caf9-f1f2-446f-8dc4-27e0be20170c");
@@ -98,6 +102,8 @@ export default function OnboardingPage() {
     setError("");
 
     const analysisData = {
+      stateCode,
+      stateName,
       districtId,
       districtName,
       talukaId,
@@ -132,9 +138,9 @@ export default function OnboardingPage() {
       const res = await startAnalysis({
         village_id: villageId,
         business_category_id: businessCategoryId,
-        available_capital: Number(capital) || 0,
-        desired_project_cost: Number(desiredProjectCost) || Number(capital) || 100000,
-        language: language || 'en',
+        available_capital: Number(capital),
+        desired_project_cost: Number(desiredProjectCost || capital),
+        language,
       });
 
       const analysisId = res.id || res.analysis_id;
@@ -167,6 +173,7 @@ export default function OnboardingPage() {
     return (
       <AppShell>
         <ReviewScreen
+          stateName={stateName}
           district={districtName || districtId}
           taluka={talukaName || talukaId}
           village={villageName || villageId}
@@ -242,6 +249,11 @@ export default function OnboardingPage() {
                   setVillageId={(id, name) => {
                     setVillageId(id);
                     setVillageName(name || "");
+                  }}
+                  stateCode={stateCode}
+                  setStateCode={(code, name) => {
+                    setStateCode(code);
+                    if (name) setStateName(name);
                   }}
                 />
 

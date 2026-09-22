@@ -5,6 +5,7 @@ import { useLanguageStore } from '@/stores/languageStore';
 import Card from '@/components/ui/Card';
 
 interface ReviewScreenProps {
+  stateName?: string;
   district: string;
   taluka: string;
   village: string;
@@ -18,6 +19,7 @@ interface ReviewScreenProps {
 }
 
 export default function ReviewScreen({
+  stateName,
   district,
   taluka,
   village,
@@ -51,7 +53,7 @@ export default function ReviewScreen({
                 <div>
                   <p className="text-xs font-bold uppercase tracking-wider text-foreground-muted">{t('onboard.reviewLocation')}</p>
                   <p className="mt-1 text-sm sm:text-base font-bold text-foreground">
-                    {district} → {taluka} → {village}
+                    {stateName ? `${stateName} → ` : ''}{district} → {taluka} → {village}
                   </p>
                 </div>
               </div>

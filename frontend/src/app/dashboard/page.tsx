@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, Suspense } from 'react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2, Sparkles, ArrowLeft, Download, FileText, CheckCircle2, Volume2, VolumeX } from 'lucide-react';
 import AppShell from '@/components/ui/AppShell';
@@ -237,11 +238,20 @@ function DashboardContent() {
               <span className="text-primary font-semibold">{locName || t('dash.pendingLoc')}</span>
             </p>
           </div>
-          {effectiveAnalysisId && (
-            <div className="mt-2 sm:mt-0 text-xs font-mono font-medium bg-primary/10 text-primary px-3.5 py-1.5 rounded-full border border-primary/20">
-              Run #{String(effectiveAnalysisId).slice(0, 8)}
-            </div>
-          )}
+          <div className="flex items-center gap-2.5">
+            <Link
+              href="/onboarding"
+              className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 hover:bg-primary/20 border border-primary/20 px-3.5 py-1.5 text-xs font-semibold text-primary transition"
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              Switch State / New Feasibility
+            </Link>
+            {effectiveAnalysisId && (
+              <div className="text-xs font-mono font-medium bg-slate-100 dark:bg-[#1F242C] text-foreground-muted px-3.5 py-1.5 rounded-full border border-border">
+                Run #{String(effectiveAnalysisId).slice(0, 8)}
+              </div>
+            )}
+          </div>
         </div>
 
         <DashboardNav activeSection={activeSection} onSectionChange={setActiveSection} />
