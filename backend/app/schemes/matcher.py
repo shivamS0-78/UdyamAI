@@ -118,6 +118,50 @@ def _latest_active_rule(db: Session, scheme_id: UUID) -> SchemeRule | None:
     return rules[0] if rules else None
 
 
+def _pick_active_rule(rules: list[SchemeRule] | None, today: date) -> SchemeRule | None:
+    if not rules:
+        return None
+    for rule in rules:
+        if rule.effective_from and rule.effective_from > today:
+            continue
+        if rule.effective_until and rule.effective_until < today:
+            continue
+        return rule
+    return rules[0]
+
+
+def latest_active_rules_by_scheme(
+    db: Session, scheme_ids: list[UUID] | None
+) -> dict[UUID, SchemeRule]:
+    """Resolve the currently-active rule for many schemes in a single round-trip.
+
+    Equivalent to calling :func:`_latest_active_rule` per scheme, but report builders that
+    walk every scheme match would otherwise issue one query per match.
+    """
+    ordered_ids = [sid for sid in dict.fromkeys(scheme_ids or []) if sid]
+    if not ordered_ids:
+        return {}
+
+    rules = db.exec(
+        select(SchemeRule)
+        .where(SchemeRule.scheme_id.in_(ordered_ids))
+        .order_by(col(SchemeRule.created_at).desc())
+    ).all()
+
+    # Rows arrive newest-first, so each group keeps the ordering _pick_active_rule expects.
+    grouped: dict[UUID, list[SchemeRule]] = {}
+    for rule in rules:
+        grouped.setdefault(rule.scheme_id, []).append(rule)
+
+    today = date.today()
+    resolved: dict[UUID, SchemeRule] = {}
+    for scheme_id, scheme_rules in grouped.items():
+        active = _pick_active_rule(scheme_rules, today)
+        if active is not None:
+            resolved[scheme_id] = active
+    return resolved
+
+
 def match_schemes_for_analysis(
     db: Session,
     *,
@@ -131,8 +175,38 @@ def match_schemes_for_analysis(
     schemes = db.exec(select(Scheme).where(Scheme.active).order_by(Scheme.name)).all()
     matches: list[SchemeMatch] = []
 
+    # Batch query all rules for active schemes in one single database round-trip
+    scheme_ids = [s.id for s in schemes if s.id]
+    rules_by_scheme: dict[UUID, list[SchemeRule]] = {}
+    rules_batch_loaded = False
+    if scheme_ids:
+        try:
+            all_rules = db.exec(
+                select(SchemeRule)
+                .where(SchemeRule.scheme_id.in_(scheme_ids))
+                .order_by(col(SchemeRule.created_at).desc())
+            ).all()
+            if isinstance(all_rules, (list, tuple)):
+                for r in all_rules:
+                    rules_by_scheme.setdefault(r.scheme_id, []).append(r)
+                # The batch is authoritative: once it succeeds, a scheme missing from the map
+                # genuinely has no rules, so no per-scheme lookup is needed (avoids N extra
+                # round-trips for every active scheme without rules).
+                rules_batch_loaded = True
+        except Exception:
+            rules_by_scheme = {}
+            rules_batch_loaded = False
+
+    today = date.today()
+
     for scheme in schemes:
-        rule = _latest_active_rule(db, scheme.id)
+        if scheme.id in rules_by_scheme:
+            rule = _pick_active_rule(rules_by_scheme[scheme.id], today)
+        elif rules_batch_loaded:
+            rule = None
+        else:
+            rule = _latest_active_rule(db, scheme.id)
+
         if not rule:
             continue
 
@@ -215,14 +289,27 @@ def match_schemes_for_analysis(
     persistable = [m for m in matches if m.match_status != SchemeMatchStatus.NOT_MATCH]
     persistable.sort(key=lambda item: item.match_score or 0.0, reverse=True)
     if persistable:
-        db.commit()
-        for match in persistable:
-            db.refresh(match)
+        db.flush()
     return persistable
 
 
-def estimate_subsidy_for_match(db: Session, scheme_id: UUID, project_cost: float) -> float:
-    rule = _latest_active_rule(db, scheme_id)
+def estimate_subsidy_for_match(
+    db: Session,
+    scheme_id: UUID,
+    project_cost: float,
+    rules_by_scheme: dict[UUID, SchemeRule] | None = None,
+) -> float:
+    """Estimate the subsidy a scheme offers for a project cost.
+
+    Pass ``rules_by_scheme`` (from :func:`latest_active_rules_by_scheme`) when estimating
+    subsidies for many schemes, so the rule lookup is served from memory instead of a query
+    per scheme.
+    """
+    rule = (
+        rules_by_scheme.get(scheme_id)
+        if rules_by_scheme is not None
+        else _latest_active_rule(db, scheme_id)
+    )
     if not rule:
         return 0.0
     return _estimate_subsidy(rule, project_cost)

@@ -9,6 +9,13 @@ const SCRIPT_BADGES: Record<string, string> = {
   en: 'EN',
   hi: 'हिं',
   mr: 'म',
+  ta: 'த',
+  te: 'తె',
+  kn: 'ಕ',
+  gu: 'ગુ',
+  bn: 'বা',
+  pa: 'ਪੰ',
+  ml: 'മ',
 };
 
 export default function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
@@ -65,11 +72,11 @@ export default function LanguageSwitcher({ compact = false }: { compact?: boolea
       {open && (
         <div
           role="listbox"
-          className="absolute right-0 top-full mt-2 z-50 w-56 rounded-2xl border border-border bg-white dark:bg-[#1C2128] p-1.5 shadow-xl backdrop-blur-md animate-in fade-in zoom-in-95 duration-150"
+          className="absolute right-0 top-full mt-2 z-50 w-64 max-h-80 overflow-y-auto rounded-2xl border border-border bg-white dark:bg-[#1C2128] p-1.5 shadow-xl backdrop-blur-md animate-in fade-in zoom-in-95 duration-150"
         >
-          <div className="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-foreground-muted border-b border-border/70 mb-1 flex items-center justify-between">
+          <div className="sticky top-0 bg-white dark:bg-[#1C2128] px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-foreground-muted border-b border-border/70 mb-1 flex items-center justify-between z-10">
             <span>{t('lang.label')}</span>
-            <span className="text-[10px] font-normal lowercase opacity-75">3 Available</span>
+            <span className="text-[10px] font-normal lowercase opacity-75">{LANGUAGE_OPTIONS.length} Available</span>
           </div>
 
           <div className="space-y-0.5">

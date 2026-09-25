@@ -10,6 +10,7 @@ the rest of the backend analysis flow.
 
 import json
 import logging
+import time
 from typing import Any
 
 from app.ai import context_builder, guardrails, llm, prompts, recommendation
@@ -27,9 +28,12 @@ def _as_string_list(value: Any) -> list[str]:
     return [str(item).strip() for item in value if item is not None and str(item).strip()]
 
 
+_ALLOWED_LANGUAGES = {"en", "hi", "mr", "ta", "te", "kn", "gu", "bn", "pa", "ml"}
+
+
 def _backend_grounded_advice(prepared_context: dict[str, Any], language: str = "en") -> AIAdvice:
     """Build advisory guidance from verified backend analysis when the LLM is unavailable."""
-    normalized_language = language if language in {"en", "hi", "mr"} else "en"
+    normalized_language = language if language in _ALLOWED_LANGUAGES else "en"
     location = prepared_context.get("location", {}) or {}
     business = prepared_context.get("business", {}) or {}
     feasibility = prepared_context.get("feasibility", {}) or {}
@@ -174,7 +178,7 @@ def _backend_grounded_advice(prepared_context: dict[str, Any], language: str = "
 
 
 def _fallback_ai_advice(language: str = "en") -> AIAdvice:
-    normalized_language = language if language in {"en", "hi", "mr"} else "en"
+    normalized_language = language if language in _ALLOWED_LANGUAGES else "en"
     return AIAdvice(
         summary="AI advisory guidance is temporarily unavailable. The backend analysis remains the authoritative source of truth.",
         recommendation="Review the verified backend analysis before making a final decision. Retry the AI advisory layer once the provider is available.",
@@ -267,17 +271,41 @@ def generate_advice(
         query_str = " ".join(query_parts) or "business scheme rules eligibility subsidy"
 
         # 2. Perform RAG Retrieval if DB session provided
+        rag_started = time.perf_counter()
         rag_response = None
         if db is not None:
             try:
-                from app.rag.retriever import retrieve_evidence
+                has_active_docs = True
+                if hasattr(db, "exec"):
+                    from sqlmodel import select
 
-                rag_response = retrieve_evidence(
-                    db=db,
-                    query=query_str,
-                    scheme_id=primary_scheme_id,
-                    language=language,
-                )
+                    from app.models.rag import Document, DocumentChunk
+
+                    try:
+                        has_active_docs = (
+                            db.exec(
+                                select(DocumentChunk.id)
+                                .join(Document, DocumentChunk.document_id == Document.id)
+                                .where(Document.active == True)  # noqa: E712
+                            ).first()
+                            is not None
+                        )
+                    except Exception:
+                        has_active_docs = True
+
+                if has_active_docs:
+                    from app.rag.retriever import retrieve_evidence
+
+                    rag_response = retrieve_evidence(
+                        db=db,
+                        query=query_str,
+                        scheme_id=primary_scheme_id,
+                        language=language,
+                    )
+                else:
+                    rag_response = RAGQueryResponse(
+                        status=RAGStatus.NO_RELEVANT_EVIDENCE.value, evidence=[]
+                    )
             except (ConnectionError, TimeoutError) as exc:
                 logger.warning("RAG vector store network/timeout issue: %s", exc)
                 rag_response = RAGQueryResponse(
@@ -295,6 +323,11 @@ def generate_advice(
                 status=RAGStatus.NO_RELEVANT_EVIDENCE.value, evidence=[]
             )
 
+        logger.info(
+            "advisor step 'rag_retrieval' finished in %.0f ms",
+            (time.perf_counter() - rag_started) * 1000,
+        )
+
         # 3. Shape AnalysisContext and RAG evidence into prompt payload.
         prepared_context = context_builder.build(analysis_context, rag_response=rag_response)
 
@@ -302,7 +335,12 @@ def generate_advice(
         prompt = prompts.build_advisor_prompt(prepared_context, language=language)
 
         # 5. Call LLM provider abstraction.
+        llm_started = time.perf_counter()
         raw_output_str = llm.generate(prompt)
+        logger.info(
+            "advisor step 'llm_generation' finished in %.0f ms",
+            (time.perf_counter() - llm_started) * 1000,
+        )
 
         # Parse JSON output if LLM returns a string
         if isinstance(raw_output_str, str):

@@ -16,9 +16,10 @@ Coordinates the end-to-end multi-step analysis pipeline:
 """
 
 import logging
+import time
 from datetime import UTC, datetime
 from typing import Any
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from fastapi import HTTPException
 from sqlmodel import Session, select
@@ -59,7 +60,29 @@ from app.services.scheme_service import SchemeService
 
 logger = logging.getLogger(__name__)
 
-SUPPORTED_LANGUAGES = {"en", "hi", "mr"}
+SUPPORTED_LANGUAGES = {
+    "en",
+    "hi",
+    "mr",
+    "ta",
+    "te",
+    "kn",
+    "gu",
+    "bn",
+    "pa",
+    "ml",
+}
+
+
+def _mark(label: str, started_at: float) -> float:
+    """Log how long the just-finished pipeline step took, and restart the clock.
+
+    The pipeline is a long synchronous request, so the only way to tell which phase
+    dominates is to time each one: set ``LOG_LEVEL=INFO`` to see the breakdown.
+    """
+    now = time.perf_counter()
+    logger.info("pipeline step '%s' finished in %.0f ms", label, (now - started_at) * 1000)
+    return now
 
 
 def _get_comp_count(res: Any) -> Any:
@@ -78,14 +101,12 @@ class AnalysisOrchestrator:
     """Orchestrates the central 12-step analysis workflow with strict transaction boundaries."""
 
     @staticmethod
-    def run_analysis_pipeline(db: Session, run_data: AnalysisRunCreate) -> AnalysisRun:
-        logger.info("Starting Analysis Orchestrator pipeline")
+    def create_run(db: Session, run_data: AnalysisRunCreate, *, status: str) -> AnalysisRun:
+        """Validate the input and persist an ``AnalysisRun`` without executing the pipeline.
 
-        category: BusinessCategory | None = None
-        village: Village | None = None
-        taluka: Taluka | None = None
-        district: District | None = None
-
+        The async submit path persists the run as ``pending`` and returns it immediately, so
+        the client has an id to poll while the pipeline runs in the background.
+        """
         # -------------------------------------------------------------
         # Step 1: Validate input
         # -------------------------------------------------------------
@@ -140,13 +161,55 @@ class AnalysisOrchestrator:
             location_id=location_id,
             business_category_id=category_id,
             available_capital=run_data.available_capital or 0.0,
-            status="running",
+            status=status,
         )
         db.add(db_run)
         db.commit()
         db.refresh(db_run)
+        return db_run
+
+    @staticmethod
+    def _claim_existing_run(db: Session, run_id: UUID) -> AnalysisRun:
+        """Mark a pre-created run as running so the pipeline can take it over."""
+        db_run = db.get(AnalysisRun, run_id)
+        if db_run is None:
+            raise HTTPException(status_code=404, detail=f"Analysis run with id {run_id} not found")
+        db_run.status = "running"
+        db.add(db_run)
+        db.commit()
+        db.refresh(db_run)
+        return db_run
+
+    @staticmethod
+    def run_analysis_pipeline(
+        db: Session, run_data: AnalysisRunCreate, run_id: UUID | None = None
+    ) -> AnalysisRun:
+        """Execute the full workflow, creating the run or taking over an existing one.
+
+        ``run_id`` is supplied by the async submit path, which persists the run before
+        returning so the client can poll its status instead of blocking on this call.
+        """
+        logger.info("Starting Analysis Orchestrator pipeline")
+
+        category: BusinessCategory | None = None
+        village: Village | None = None
+        taluka: Taluka | None = None
+        district: District | None = None
+
+        db_run = (
+            AnalysisOrchestrator._claim_existing_run(db, run_id)
+            if run_id is not None
+            else AnalysisOrchestrator.create_run(db, run_data, status="running")
+        )
+        # Read the identifiers back off the run so the pipeline behaves identically whether
+        # it created the run or took over one persisted earlier by the async submit path.
+        location_id = db_run.location_id
+        category_id = db_run.business_category_id
+        user_id = db_run.user_id
 
         try:
+            step_started = time.perf_counter()
+
             # -------------------------------------------------------------
             # Step 3: Fetch location
             # -------------------------------------------------------------
@@ -173,6 +236,8 @@ class AnalysisOrchestrator:
                     detail=f"District associated with Taluka {taluka.id} not found",
                 )
 
+            step_started = _mark("fetch_location", step_started)
+
             # -------------------------------------------------------------
             # Step 4: Fetch business category
             # -------------------------------------------------------------
@@ -197,6 +262,7 @@ class AnalysisOrchestrator:
                 desired_project_cost=desired_cost,
                 available_capital=avail_cap,
             )
+            step_started = _mark("scheme_matching", step_started)
 
             best_match = db_scheme_matches[0] if db_scheme_matches else None
             best_rule = (
@@ -227,6 +293,7 @@ class AnalysisOrchestrator:
                 analysis_run_id=db_run.id,
             )
             financial_calc = FinanceService.calculate_finance(finance_req, session=db)
+            step_started = _mark("finance", step_started)
 
             # -------------------------------------------------------------
             # Step 6: Run market analysis
@@ -258,15 +325,31 @@ class AnalysisOrchestrator:
                 )
             market_res = radius_results[0]
 
+            step_started = _mark("market_analysis", step_started)
+
             # -------------------------------------------------------------
             # Step 7: Run competition analysis
             # -------------------------------------------------------------
+            # Step 6 already ran the identical category/radius competition analysis over the
+            # same nearby businesses, so reuse its result rather than repeating the spatial scan.
+            market_indicators = getattr(market_res, "market_indicators", None)
+            precomputed_comp = (
+                market_indicators.get("competition")
+                if isinstance(market_indicators, dict)
+                else None
+            )
             competition_res = MarketService.analyze_competition_for_location(
                 db,
                 village_id=village.id,
                 business_category_id=category.id,
+                category_name=getattr(category, "name", None),
                 radius_km=10.0,
+                precomputed_comp_res=precomputed_comp
+                if isinstance(precomputed_comp, dict)
+                else None,
             )
+
+            step_started = _mark("competition_analysis", step_started)
 
             # -------------------------------------------------------------
             # Step 8: Scheme matches already computed during finance setup
@@ -280,6 +363,40 @@ class AnalysisOrchestrator:
             # Step 9: Run feasibility
             # -------------------------------------------------------------
             est_subsidy_val = getattr(financial_calc, "potential_subsidy", 0.0) or 0.0
+            comp_cnt = _get_comp_count(competition_res)
+            comp_dict = {
+                "competitor_count": comp_cnt,
+                "direct_competitor_count": getattr(
+                    competition_res, "direct_competitor_count", comp_cnt
+                ),
+                "competition_density_per_km2": getattr(
+                    competition_res,
+                    "competitor_density",
+                    getattr(competition_res, "competition_density", 0.0),
+                ),
+            }
+            mkt_size = getattr(market_res, "market_size", None)
+            pop_pre = (
+                getattr(mkt_size, "total_population_reach", None)
+                if mkt_size
+                else getattr(market_res, "estimated_population_reach", None)
+            )
+            hh_pre = (
+                getattr(mkt_size, "household_reach", None)
+                if mkt_size
+                else getattr(market_res, "estimated_household_reach", None)
+            )
+
+            mkt_indicators_pre = (
+                market_res.market_indicators
+                if hasattr(market_res, "market_indicators")
+                and isinstance(market_res.market_indicators, dict)
+                else {}
+            )
+            risk_pre = (
+                mkt_indicators_pre.get("risks") if isinstance(mkt_indicators_pre, dict) else None
+            )
+
             feasibility_score_res = FeasibilityService.calculate_feasibility(
                 db,
                 village_id=village.id,
@@ -288,7 +405,13 @@ class AnalysisOrchestrator:
                 desired_project_cost=desired_cost,
                 estimated_subsidy=est_subsidy_val,
                 matched_schemes=db_scheme_matches,
+                precomputed_pop_reach=pop_pre,
+                precomputed_hh_reach=hh_pre,
+                precomputed_comp_res=comp_dict,
+                precomputed_risk_res=risk_pre if isinstance(risk_pre, dict) else None,
             )
+
+            step_started = _mark("feasibility", step_started)
 
             # -------------------------------------------------------------
             # Step 10: Build AnalysisContext
@@ -364,8 +487,23 @@ class AnalysisOrchestrator:
             )
 
             scheme_contexts = []
+            scheme_ids = [
+                match.scheme_id for match in db_scheme_matches if getattr(match, "scheme_id", None)
+            ]
+            schemes_by_id = {}
+            if scheme_ids:
+                try:
+                    from app.models.scheme import Scheme
+
+                    all_sch = db.exec(select(Scheme).where(Scheme.id.in_(scheme_ids))).all()
+                    schemes_by_id = {s.id: s for s in all_sch if s.id}
+                except Exception:
+                    schemes_by_id = {}
+
             for match in db_scheme_matches:
-                sch_obj = SchemeService.get_scheme_by_id(db, match.scheme_id)
+                sch_obj = schemes_by_id.get(match.scheme_id) or SchemeService.get_scheme_by_id(
+                    db, match.scheme_id
+                )
                 if sch_obj:
                     scheme_contexts.append(
                         SchemeMatchContext(
@@ -513,12 +651,16 @@ class AnalysisOrchestrator:
                 language=lang_str,
             )
 
+            step_started = _mark("build_context", step_started)
+
             # -------------------------------------------------------------
             # Step 11: Hand context to AI Advisor
             # -------------------------------------------------------------
             ai_advice = advisor.generate_advice(
                 analysis_context=analysis_context, language=lang_str, db=db
             )
+
+            step_started = _mark("ai_advisor", step_started)
 
             # -------------------------------------------------------------
             # Step 12: Save final results
@@ -647,6 +789,8 @@ class AnalysisOrchestrator:
             db.add(db_run)
             db.commit()
             db.refresh(db_run)
+            _mark("persist_results", step_started)
+            logger.info("Analysis orchestrator pipeline completed for run %s", db_run.id)
             return db_run
 
         except Exception as exc:

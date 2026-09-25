@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowRight, Loader2, UserRound, Building2, Mail } from 'lucide-react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
@@ -9,6 +9,7 @@ import Logo from '@/components/ui/Logo';
 import { createProfile } from '@/lib/api';
 import { storeProfile } from '@/lib/auth';
 import { useLanguageStore } from '@/stores/languageStore';
+import { LANGUAGE_OPTIONS, type Language } from '@/lib/i18n';
 
 const BUSINESS_TYPES = [
   { value: '', label: 'Select business category' },
@@ -24,20 +25,40 @@ const BUSINESS_TYPES = [
   { value: 'other', label: 'Other Enterprise' },
 ];
 
-export default function SetupPage() {
+function SetupContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isEditing = searchParams.get('edit') === 'true';
+
   const t = useLanguageStore((s) => s.t);
   const language = useLanguageStore((s) => s.language);
   const setLanguage = useLanguageStore((s) => s.setLanguage);
-  const { user, profile } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
 
-  const [name, setName] = useState('');
-  const [businessName, setBusinessName] = useState('');
-  const [businessType, setBusinessType] = useState('');
+  const [name, setName] = useState(profile?.name || '');
+  const [businessName, setBusinessName] = useState(profile?.business_name || '');
+  const [businessType, setBusinessType] = useState((profile as any)?.business_type || '');
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
 
-  const email = user?.email ?? '';
+  const email = user?.email ?? profile?.email ?? '';
+
+  // Pre-fill fields when profile is loaded
+  useEffect(() => {
+    if (profile) {
+      if (profile.name) setName((prev: string) => prev || profile.name || '');
+      if (profile.business_name) setBusinessName((prev: string) => prev || profile.business_name || '');
+      if ((profile as any).business_type) setBusinessType((prev: string) => prev || (profile as any).business_type || '');
+      if (profile.preferred_language) setLanguage(profile.preferred_language as Language);
+    }
+  }, [profile, setLanguage]);
+
+  // If user already has a complete profile and isn't explicitly editing, redirect to dashboard
+  useEffect(() => {
+    if (!isEditing && profile?.name && profile?.business_name) {
+      router.replace('/dashboard');
+    }
+  }, [profile, isEditing, router]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,6 +79,7 @@ export default function SetupPage() {
         preferred_language: language,
       });
       storeProfile(savedProfile);
+      await refreshProfile();
       router.push('/dashboard');
     } catch (err) {
       console.error('Profile setup failed:', err);
@@ -177,12 +199,14 @@ export default function SetupPage() {
           <select
             id="setup-language"
             value={language}
-            onChange={(e) => setLanguage(e.target.value as 'en' | 'hi' | 'mr')}
+            onChange={(e) => setLanguage(e.target.value as Language)}
             className="mb-6 w-full rounded-2xl border border-slate-200 bg-slate-50/50 px-4 py-3.5 text-sm outline-none transition focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20 text-foreground"
           >
-            <option value="en">English (English)</option>
-            <option value="hi">हिंदी (Hindi)</option>
-            <option value="mr">मराठी (Marathi)</option>
+            {LANGUAGE_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.nativeLabel} ({opt.englishLabel})
+              </option>
+            ))}
           </select>
 
           {error && (
@@ -216,5 +240,19 @@ export default function SetupPage() {
         </form>
       </div>
     </main>
+  );
+}
+
+export default function SetupPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-background">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      }
+    >
+      <SetupContent />
+    </Suspense>
   );
 }

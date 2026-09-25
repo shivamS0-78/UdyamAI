@@ -13,7 +13,7 @@ import AppShell from "@/components/ui/AppShell";
 import Card from "@/components/ui/Card";
 import DemoBadge, { DemoScenarioButton } from "@/components/ui/DemoBadge";
 
-import { startAnalysis } from "@/lib/api";
+import { startAnalysis, waitForAnalysisCompletion } from "@/lib/api";
 import { type Language } from "@/lib/i18n";
 import { useLanguageStore } from "@/stores/languageStore";
 
@@ -149,6 +149,7 @@ export default function OnboardingPage() {
           localStorage.setItem("udyam_active_analysis_id", String(analysisId));
           localStorage.removeItem("udyam_draft_analysis");
         }
+        await waitForAnalysisCompletion(String(analysisId));
         router.push(`/dashboard?analysis_id=${analysisId}`);
       } else {
         router.push('/dashboard');

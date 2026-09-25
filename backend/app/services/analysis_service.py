@@ -15,7 +15,7 @@ from app.schemas.feasibility import (
     AnalysisStatusResponse,
     ConsolidatedAnalysisResponse,
 )
-from app.schemes.matcher import estimate_subsidy_for_match
+from app.schemes.matcher import estimate_subsidy_for_match, latest_active_rules_by_scheme
 
 _AI_UNAVAILABLE_MARKERS = (
     "ai advisory guidance is temporarily unavailable",
@@ -425,10 +425,22 @@ class AnalysisService:
 
         # Scheme matches
         matches = db.exec(select(SchemeMatch).where(SchemeMatch.analysis_run_id == run_id)).all()
+
+        # Batch the per-scheme lookups: schemes and their active rules are fetched in one
+        # query each, instead of two queries for every match on this request path.
+        matched_scheme_ids = [m.scheme_id for m in matches if m.scheme_id]
+        schemes_by_id: dict[UUID, Scheme] = {}
+        if matched_scheme_ids:
+            schemes_by_id = {
+                s.id: s
+                for s in db.exec(select(Scheme).where(Scheme.id.in_(matched_scheme_ids))).all()
+            }
+        rules_by_scheme = latest_active_rules_by_scheme(db, matched_scheme_ids)
+
         schemes_data = []
         max_subsidy_est = 0.0
         for m in matches:
-            sch_obj = db.get(Scheme, m.scheme_id) if m.scheme_id else None
+            sch_obj = schemes_by_id.get(m.scheme_id) if m.scheme_id else None
             s_name = (
                 sch_obj.name if sch_obj and sch_obj.name else "Government Welfare & Subsidy Scheme"
             )
@@ -441,7 +453,13 @@ class AnalysisService:
             s_url = sch_obj.official_url if sch_obj else None
 
             proj_cost = m.estimated_project_cost or 0
-            sub_est = estimate_subsidy_for_match(db, m.scheme_id, proj_cost) if m.scheme_id else 0.0
+            sub_est = (
+                estimate_subsidy_for_match(
+                    db, m.scheme_id, proj_cost, rules_by_scheme=rules_by_scheme
+                )
+                if m.scheme_id
+                else 0.0
+            )
             if sub_est > max_subsidy_est:
                 max_subsidy_est = sub_est
 

@@ -287,6 +287,38 @@ class TestMarketServiceCompetitionOrchestration:
                 limit=500,
             )
 
+    def test_precomputed_competition_skips_spatial_lookup(self):
+        """Reusing an existing analyze_competition result must not re-run the spatial query."""
+        mock_db = MagicMock()
+        precomputed = analyze_competition(
+            [
+                {
+                    "id": uuid4(),
+                    "business_category_id": str(uuid4()),
+                    "category": "Dairy",
+                    "distance_meters": 3000.0,
+                }
+            ],
+            radius_km=10.0,
+            target_category_name="Dairy",
+        )
+
+        with patch("app.services.market_service.find_nearby_businesses") as mock_find:
+            res = MarketService.analyze_competition_for_location(
+                db=mock_db,
+                village_id=uuid4(),
+                radius_km=10.0,
+                category_name="Dairy",
+                precomputed_comp_res=precomputed,
+            )
+
+        mock_find.assert_not_called()
+        # No coordinates were resolved either: the village is never fetched on this path.
+        mock_db.get.assert_not_called()
+        assert res.competitor_count == 1
+        assert res.competitor_density == precomputed["competitor_density"]
+        assert res.target_category == "Dairy"
+
 
 class TestCompetitionAPIEndpoints:
     """Test API route endpoints for Phase 7 Competition Analysis."""

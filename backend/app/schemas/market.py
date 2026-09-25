@@ -123,6 +123,16 @@ class CompetitionAnalysisRequest(LocationValidatedModel):
     )
 
 
+class NearbyCompetitorSummary(BaseModel):
+    id: UUID | None = None
+    name: str | None = None
+    category: str | None = None
+    distance_km: float
+    verified: bool = False
+    latitude: float | None = None
+    longitude: float | None = None
+
+
 class CompetitionAnalysisDetailResponse(BaseModel):
     competitor_count: int = Field(..., description="Direct competitors in selected category")
     competitor_density: float = Field(..., description="Competitors per square km")
@@ -135,6 +145,9 @@ class CompetitionAnalysisDetailResponse(BaseModel):
     category_distribution: dict[str, int] = Field(default_factory=dict)
     identified_market_gaps: list[str] = Field(default_factory=list)
     quality_indicator: dict[str, Any] = Field(default_factory=dict)
+    direct_competitors: list[dict[str, Any]] = Field(default_factory=list)
+    nearest_competitor_distance_km: float | None = None
+    competition_safety_margin: float | None = None
     data_confidence: str = "medium"
     provenance: list[MarketProvenanceInfo] = Field(default_factory=list)
 
@@ -206,6 +219,8 @@ class RadiusMarketAnalysisResult(BaseModel):
     nearby_markets: list[NearbyMarketSummary] = Field(default_factory=list)
     relevant_infrastructure_count: int = 0
     relevant_infrastructure: list[NearbyInfrastructureSummary] = Field(default_factory=list)
+    nearby_competitors_count: int = 0
+    nearby_competitors: list[NearbyCompetitorSummary] = Field(default_factory=list)
     market_indicators: dict[str, Any] = Field(default_factory=dict)
     provenance: list[MarketProvenanceInfo] = Field(default_factory=list)
 

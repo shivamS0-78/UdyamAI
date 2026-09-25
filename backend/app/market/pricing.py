@@ -61,8 +61,10 @@ def analyze_market_pricing(
 
     # Determine volatility based on spread
     volatility = "low"
-    if min_modal and max_modal and avg_modal and avg_modal > 0:
+    volatility_score = 0.0
+    if min_modal is not None and max_modal is not None and avg_modal and avg_modal > 0:
         spread_pct = (max_modal - min_modal) / avg_modal
+        volatility_score = round(min(1.0, spread_pct), 2)
         if spread_pct > 0.4:
             volatility = "high"
         elif spread_pct > 0.2:
@@ -108,5 +110,7 @@ def analyze_market_pricing(
         "commodity_coverage_count": len(commodities),
         "prices_analyzed_count": len(market_prices),
         "price_volatility": volatility,
+        "price_volatility_score": volatility_score,
+        "volatility_score": volatility_score,
         "provenance": provenance_entries,
     }

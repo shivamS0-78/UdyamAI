@@ -148,26 +148,27 @@ def find_within_radius(
 
     geom = getattr(model, geo_col)
     point = func.ST_SetSRID(func.ST_MakePoint(lng, lat), 4326)
-
-    # Fall back to lat/lng point when the geography column is unset
+    # Direct PostGIS index lookup on geom with bounding box pre-filter
     lat_col = getattr(model, "latitude", None)
     lng_col = getattr(model, "longitude", None)
-    if lat_col is not None and lng_col is not None:
-        effective_geom = func.coalesce(
-            geom,
-            func.ST_SetSRID(func.ST_MakePoint(lng_col, lat_col), 4326),
-        )
-        spatial_where = func.ST_DWithin(
-            effective_geom,
-            point,
-            radius_meters,
-        )
-        distance_expr = func.ST_Distance(effective_geom, point).label("distance_meters")
-    else:
-        spatial_where = func.ST_DWithin(geom, point, radius_meters)
-        distance_expr = func.ST_Distance(geom, point).label("distance_meters")
+
+    spatial_where = func.ST_DWithin(geom, point, radius_meters)
+    distance_expr = func.ST_Distance(geom, point).label("distance_meters")
 
     stmt = select(model, distance_expr).where(spatial_where)
+
+    if lat_col is not None and lng_col is not None:
+        import math
+
+        d_lat = (radius_km * 1.15) / 111.0
+        cos_lat = max(0.1, math.cos(math.radians(lat)))
+        d_lng = (radius_km * 1.15) / (111.0 * cos_lat)
+        stmt = stmt.where(
+            lat_col >= lat - d_lat,
+            lat_col <= lat + d_lat,
+            lng_col >= lng - d_lng,
+            lng_col <= lng + d_lng,
+        )
 
     # Apply additional non-spatial filters in the DB
     if filters:

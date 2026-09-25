@@ -48,6 +48,7 @@ def analyze_competition(
         norm_target_name = stripped if stripped else None
 
     has_filter = bool(target_category_id or norm_target_name)
+    direct_competitors: list[dict[str, Any]] = []
 
     for b in businesses:
         cat_id = (
@@ -68,11 +69,24 @@ def analyze_competition(
             # If no filter specified, count all categorized commercial businesses
             is_competitor = True
 
+        dist_m = b.get("distance_meters")
+        dist_km = round((dist_m or 0.0) / 1000.0, 2) if dist_m is not None else 0.0
+
         if is_competitor:
             competitor_count += 1
+            direct_competitors.append(
+                {
+                    "id": str(b.get("id")) if b.get("id") else None,
+                    "name": b.get("name") or "Local Enterprise",
+                    "category": b.get("category") or target_category_name or "Commercial",
+                    "distance_km": dist_km,
+                    "verified": bool(b.get("verified_at")),
+                    "latitude": b.get("latitude"),
+                    "longitude": b.get("longitude"),
+                }
+            )
 
         # Distance-based breakdown (only count when distance_meters is explicitly available)
-        dist_m = b.get("distance_meters")
         if dist_m is not None:
             if dist_m <= 5000.0 and is_competitor:
                 competitors_5km += 1
@@ -90,8 +104,19 @@ def analyze_competition(
         if source or source_url or data_year:
             sources.add((source, source_url, data_year))
 
+    direct_competitors.sort(key=lambda c: c["distance_km"])
+    nearest_competitor_dist = direct_competitors[0]["distance_km"] if direct_competitors else None
+
     competitor_density = round(competitor_count / area_km2, 2)
     data_available = total_businesses > 0
+
+    # Dynamic competition safety margin (0.0 to 100.0%)
+    if competitor_count == 0:
+        competition_safety_margin = 95.0
+    else:
+        competition_safety_margin = round(
+            max(15.0, min(95.0, 100.0 - (competitor_density * 8.0) - (competitor_count * 3.5))), 1
+        )
 
     # Market gap identification
     market_gaps = []
@@ -185,6 +210,9 @@ def analyze_competition(
         "businesses_within_10km": competitors_10km,
         "total_businesses_in_radius": total_businesses,
         "direct_competitor_count": competitor_count,
+        "direct_competitors": direct_competitors[:25],
+        "nearest_competitor_distance_km": nearest_competitor_dist,
+        "competition_safety_margin": competition_safety_margin,
         "competition_density_per_km2": competitor_density,
         "category_distribution": category_counts,
         "identified_market_gaps": market_gaps,

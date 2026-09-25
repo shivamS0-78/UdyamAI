@@ -127,7 +127,9 @@ sequenceDiagram
 ```python
 # Guardrail Validation Rule (Excerpt)
 if _contains_invented_financial_claim(text, context, has_verified_sources=has_verified):
-    raise ValueError("AI output contains invented financial or subsidy claims not supported by backend context.")
+    raise ValueError(
+        "AI output contains invented financial or subsidy claims not supported by backend context."
+    )
 ```
 
 ---

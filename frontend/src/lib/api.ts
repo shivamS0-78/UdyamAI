@@ -440,7 +440,49 @@ export async function getAnalysisStatus(analysisId: string) {
   return res.json();
 }
 
-export async function getConsolidatedAnalysis(analysisId: string): Promise<ConsolidatedAnalysisData> {
+export const ANALYSIS_POLL_INTERVAL_MS = 2000;
+export const ANALYSIS_POLL_TIMEOUT_MS = 5 * 60 * 1000;
+
+const TERMINAL_ANALYSIS_STATUSES = ['completed', 'failed'];
+
+/**
+ * Wait until a queued analysis run finishes.
+ *
+ * Submission is asynchronous: the API returns an id straight away and runs the pipeline
+ * in the background, so callers have to wait for a terminal status before loading results.
+ * Polls the lightweight status endpoint rather than the full consolidated payload.
+ */
+export async function waitForAnalysisCompletion(
+  analysisId: string,
+  {
+    intervalMs = ANALYSIS_POLL_INTERVAL_MS,
+    timeoutMs = ANALYSIS_POLL_TIMEOUT_MS,
+  }: { intervalMs?: number; timeoutMs?: number } = {}
+): Promise<{ status: string; progress_percentage?: number }> {
+  const deadline = Date.now() + timeoutMs;
+  let latest = await getAnalysisStatus(analysisId);
+
+  while (!TERMINAL_ANALYSIS_STATUSES.includes(latest?.status)) {
+    if (Date.now() >= deadline) {
+      throw new Error('Analysis is taking longer than expected. Please refresh in a moment.');
+    }
+    await new Promise((resolve) => setTimeout(resolve, intervalMs));
+    latest = await getAnalysisStatus(analysisId);
+  }
+
+  return latest;
+}
+
+export async function getConsolidatedAnalysis(
+  analysisId: string,
+  autoWait: boolean = true
+): Promise<ConsolidatedAnalysisData> {
+  if (autoWait) {
+    const latest = await waitForAnalysisCompletion(analysisId);
+    if (latest.status === 'failed') {
+      throw new Error('Analysis processing failed.');
+    }
+  }
   const res = await apiFetch(`${API_BASE_URL}/api/v1/analysis/${analysisId}/consolidated`);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();

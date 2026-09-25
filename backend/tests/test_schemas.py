@@ -109,6 +109,14 @@ def test_supported_languages_validation():
     )
     assert req_mr.language == SupportedLanguage.MR
 
+    for lang_code in ("ta", "te", "kn", "gu", "bn", "pa", "ml"):
+        req = ReportCreateRequest(
+            analysis_run_id=uuid4(),
+            user_id=uuid4(),
+            language=lang_code,
+        )
+        assert req.language == lang_code
+
     # Unsupported language code raises ValidationError
     with pytest.raises(ValidationError):
         ReportCreateRequest(

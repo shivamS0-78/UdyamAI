@@ -5,6 +5,13 @@ class SupportedLanguage(StrEnum):
     EN = "en"
     HI = "hi"
     MR = "mr"
+    TA = "ta"
+    TE = "te"
+    KN = "kn"
+    GU = "gu"
+    BN = "bn"
+    PA = "pa"
+    ML = "ml"
 
 
 class AnalysisStatus(StrEnum):

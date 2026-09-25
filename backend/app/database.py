@@ -8,7 +8,7 @@ from geoalchemy2.functions import GenericFunction
 from sqlalchemy import event, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.ext.compiler import compiles
-from sqlalchemy.pool import QueuePool, StaticPool
+from sqlalchemy.pool import NullPool, QueuePool, StaticPool
 from sqlmodel import Session, SQLModel, create_engine
 
 from app.config import settings
@@ -62,15 +62,23 @@ def get_engine():
 
     if "postgresql" in db_url:
         try:
+            pool_cls = NullPool if ("supabase" in db_url or "pooler" in db_url) else QueuePool
+            pool_kwargs = (
+                {}
+                if pool_cls is NullPool
+                else {
+                    "pool_size": 10,
+                    "max_overflow": 20,
+                    "pool_recycle": 300,
+                    "pool_pre_ping": True,
+                }
+            )
             _engine = create_engine(
                 db_url,
-                poolclass=QueuePool,
-                pool_size=10,
-                max_overflow=20,
-                pool_recycle=300,
-                pool_pre_ping=True,
+                poolclass=pool_cls,
                 connect_args={"connect_timeout": 15},
                 echo=False,
+                **pool_kwargs,
             )
         except Exception as exc:
             if allow_sqlite_fallback:
@@ -94,15 +102,20 @@ def get_engine():
     return _engine
 
 
-class _EngineProxy:
-    def __getattr__(self, name):
-        return getattr(get_engine(), name)
+def __getattr__(name: str):
+    """Expose ``engine`` lazily as a real Engine instance (PEP 562).
 
-    def __repr__(self):
-        return repr(get_engine())
-
-
-engine = _EngineProxy()
+    This must be a genuine ``sqlalchemy.engine.Engine`` — wrapping it in a
+    lightweight proxy object breaks ``Session(engine)`` users: SQLAlchemy
+    does not recognize a proxy as a bind, so the Session never enrolls it
+    in its transaction and every statement runs on its own auto-commit
+    connection. With the NullPool used for Supabase that silently tears
+    multi-statement transactions apart (a flushed INSERT becomes invisible
+    to the next statement and FK checks fail).
+    """
+    if name == "engine":
+        return get_engine()
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
 def init_db():
@@ -168,7 +181,7 @@ def _ensure_profiles_columns(eng):
 
 
 def get_session():
-    with Session(get_engine()) as session:
+    with Session(get_engine(), expire_on_commit=False) as session:
         yield session
 
 

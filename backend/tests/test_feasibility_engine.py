@@ -261,6 +261,42 @@ class TestFeasibilityServiceOrchestration:
                 "Insufficient data to assess competition" in w for w in res.swot.weakness_indicators
             )
 
+    def test_precomputed_metrics_skip_redundant_spatial_lookups(self):
+        """Runs driven by the analysis orchestrator must not repeat radius scans it already has."""
+        mock_db = MagicMock()
+        mock_db.get.return_value = None
+        mock_db.exec.return_value.all.return_value = []
+        mock_db.exec.return_value.first.return_value = None
+
+        with (
+            patch("app.services.feasibility_service.find_nearby_businesses") as mock_biz,
+            patch("app.services.feasibility_service.find_nearby_facilities") as mock_facs,
+            patch("app.services.feasibility_service.find_nearby_markets") as mock_mkts,
+            patch("app.services.feasibility_service.find_nearby_villages") as mock_vils,
+        ):
+            mock_mkts.return_value = []
+            res = FeasibilityService.calculate_feasibility(
+                db=mock_db,
+                lat=18.52,
+                lng=73.85,
+                radius_km=10.0,
+                available_capital=200000.0,
+                desired_project_cost=500000.0,
+                precomputed_pop_reach=10000,
+                precomputed_hh_reach=2000,
+                precomputed_comp_res={"competitor_count": 3, "direct_competitor_count": 3},
+                precomputed_infra_res={"facility_counts_by_type": {}},
+            )
+
+        mock_biz.assert_not_called()
+        mock_vils.assert_not_called()
+        mock_facs.assert_not_called()
+        # Markets feed nearest-distance metrics that the orchestrator does not precompute.
+        mock_mkts.assert_called_once()
+
+        assert isinstance(res, FeasibilityScoreResult)
+        assert res.competition_score is not None
+
 
 class TestFeasibilityAPIEndpoints:
     """Test API route endpoints for Feasibility Engine."""

@@ -12,7 +12,8 @@ class ReportCreateRequest(BaseModel):
     user_id: UUID
     title: str | None = Field(default=None, max_length=255)
     language: SupportedLanguage = Field(
-        default=SupportedLanguage.EN, description="Supported report language ('en', 'hi', 'mr')"
+        default=SupportedLanguage.EN,
+        description="Supported report language ('en', 'hi', 'mr', 'ta', 'te', 'kn', 'gu', 'bn', 'pa', 'ml')",
     )
 
 

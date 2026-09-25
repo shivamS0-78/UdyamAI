@@ -183,6 +183,51 @@ def _mock_exec(rows):
     return mock_db
 
 
+class TestFindWithinRadiusIndexUsage:
+    """The spatial predicate must stay spliceable into a GiST index scan.
+
+    Wrapping the geography column in an expression (e.g. ``coalesce(geom, ...)``)
+    makes PostgreSQL fall back to a sequential scan, so the geo column has to be
+    passed to ``ST_DWithin`` bare.
+    """
+
+    def _compiled_sql(self, model) -> str:
+        from sqlalchemy.dialects import postgresql
+
+        captured = {}
+        mock_db = MagicMock()
+
+        def _capture(stmt):
+            captured["stmt"] = stmt
+            result = MagicMock()
+            result.all.return_value = []
+            return result
+
+        mock_db.exec.side_effect = _capture
+        find_within_radius(db=mock_db, model=model, lat=18.52, lng=73.85, radius_km=10.0)
+
+        return str(
+            captured["stmt"].compile(
+                dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}
+            )
+        ).lower()
+
+    @pytest.mark.parametrize(
+        ("model", "geo_column"),
+        [
+            (Village, "villages.geom"),
+            (Business, "businesses.geom"),
+            (Market, "markets.geog"),
+            (Infrastructure, "infrastructure.geog"),
+        ],
+    )
+    def test_st_dwithin_receives_the_bare_geo_column(self, model, geo_column):
+        sql = self._compiled_sql(model)
+
+        assert f"st_dwithin({geo_column}" in sql
+        assert "coalesce(" not in sql
+
+
 class TestFindWithinRadius:
     def test_returns_results_with_distance(self):
         """Test that find_within_radius returns dicts with distance_meters."""

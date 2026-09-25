@@ -150,11 +150,15 @@ def calculate_infrastructure_score(
     if not isinstance(facility_counts, dict):
         facility_counts = {}
 
-    financial_count = max(0, int(facility_counts.get("bank", 0) or 0)) + max(
-        0, int(facility_counts.get("atm", 0) or 0)
+    financial_count = (
+        max(0, int(facility_counts.get("bank", 0) or 0))
+        + max(0, int(facility_counts.get("bank_branch", 0) or 0))
+        + max(0, int(facility_counts.get("atm", 0) or 0))
     )
-    logistics_count = max(0, int(facility_counts.get("cold_storage", 0) or 0)) + max(
-        0, int(facility_counts.get("warehouse", 0) or 0)
+    logistics_count = (
+        max(0, int(facility_counts.get("cold_storage", 0) or 0))
+        + max(0, int(facility_counts.get("warehouse", 0) or 0))
+        + max(0, int(facility_counts.get("processing_unit", 0) or 0))
     )
     other_infra = max(0, int(facility_counts.get("mandi", 0) or 0)) + max(
         0, int(facility_counts.get("market", 0) or 0)

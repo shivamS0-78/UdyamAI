@@ -61,6 +61,15 @@ class FeasibilityService:
         desired_project_cost: float = 0.0,
         estimated_subsidy: float | None = None,
         matched_schemes: list[Any] | None = None,
+        precomputed_nearby_biz: list[dict] | None = None,
+        precomputed_nearby_facs: list[dict] | None = None,
+        precomputed_nearby_mkts: list[dict] | None = None,
+        precomputed_nearby_vils: list[dict] | None = None,
+        precomputed_pop_reach: int | None = None,
+        precomputed_hh_reach: int | None = None,
+        precomputed_comp_res: dict[str, Any] | None = None,
+        precomputed_infra_res: dict[str, Any] | None = None,
+        precomputed_risk_res: dict[str, Any] | None = None,
     ) -> FeasibilityScoreResult:
         """Perform unified feasibility analysis for a location and project parameters."""
         target_lat = lat
@@ -84,78 +93,95 @@ class FeasibilityService:
                 detail="Location coordinates (lat, lng) or a valid village_id are required for feasibility calculation.",
             )
 
-        # Retrieve empirical spatial data
-        nearby_biz = find_nearby_businesses(
-            db,
-            lat=target_lat,
-            lng=target_lng,
-            radius_km=max(radius_km, 25.0),
-            category_id=business_category_id,
-            limit=500,
+        # Retrieve empirical spatial data (or use precomputed values when passed by orchestrator).
+        # A radius lookup is skipped outright when the only thing consuming it already has a
+        # precomputed result. The orchestrator passes competition, population and infrastructure
+        # metrics straight from the market-analysis step, so re-querying them here would add
+        # several full spatial scans to every analysis run for nothing.
+        nearby_biz = precomputed_nearby_biz if precomputed_nearby_biz is not None else []
+        if precomputed_nearby_biz is None and precomputed_comp_res is None:
+            nearby_biz = find_nearby_businesses(
+                db,
+                lat=target_lat,
+                lng=target_lng,
+                radius_km=max(radius_km, 25.0),
+                category_id=business_category_id,
+                limit=500,
+            )
+        nearby_facs = precomputed_nearby_facs if precomputed_nearby_facs is not None else []
+        if precomputed_nearby_facs is None and precomputed_infra_res is None:
+            nearby_facs = find_nearby_facilities(
+                db, lat=target_lat, lng=target_lng, radius_km=radius_km, limit=500
+            )
+        nearby_mkts = (
+            precomputed_nearby_mkts
+            if precomputed_nearby_mkts is not None
+            else find_nearby_markets(
+                db, lat=target_lat, lng=target_lng, radius_km=max(radius_km, 35.0), limit=50
+            )
         )
-        nearby_facs = find_nearby_facilities(
-            db, lat=target_lat, lng=target_lng, radius_km=radius_km, limit=500
-        )
-        # APMC mandis are regional hubs; search within realistic market radius
-        nearby_mkts = find_nearby_markets(
-            db, lat=target_lat, lng=target_lng, radius_km=max(radius_km, 35.0), limit=50
-        )
-        nearby_vils = find_nearby_villages(
-            db, lat=target_lat, lng=target_lng, radius_km=max(radius_km, 15.0), limit=500
-        )
+        nearby_vils = precomputed_nearby_vils if precomputed_nearby_vils is not None else []
+        if precomputed_nearby_vils is None and precomputed_pop_reach is None:
+            nearby_vils = find_nearby_villages(
+                db, lat=target_lat, lng=target_lng, radius_km=max(radius_km, 15.0), limit=500
+            )
 
-        # 1. Market metrics - retrieve demographic data from Population table
-        all_vil_ids = [v["id"] for v in nearby_vils if v.get("id")]
-        if village_id and village_id not in all_vil_ids:
-            all_vil_ids.append(village_id)
+        # 1. Market metrics - retrieve demographic data from Population table (or use precomputed)
+        if precomputed_pop_reach is not None:
+            pop_reach = precomputed_pop_reach
+            hh_reach = precomputed_hh_reach if precomputed_hh_reach is not None else 0
+        else:
+            all_vil_ids = [v["id"] for v in nearby_vils if v.get("id")]
+            if village_id and village_id not in all_vil_ids:
+                all_vil_ids.append(village_id)
 
-        def _val(obj: Any, attr: str) -> int:
-            if obj is None:
-                return 0
-            val = getattr(obj, attr, None)
-            if val is not None and not isinstance(val, bool):
-                try:
-                    return int(val)
-                except (ValueError, TypeError):
-                    pass
-            pop_obj = getattr(obj, "Population", None)
-            if pop_obj is not None:
-                val2 = getattr(pop_obj, attr, None)
-                if val2 is not None and not isinstance(val2, bool):
+            def _val(obj: Any, attr: str) -> int:
+                if obj is None:
+                    return 0
+                val = getattr(obj, attr, None)
+                if val is not None and not isinstance(val, bool):
                     try:
-                        return int(val2)
+                        return int(val)
                     except (ValueError, TypeError):
                         pass
-            if isinstance(obj, (tuple, list)) and len(obj) > 0:
-                return _val(obj[0], attr)
-            return 0
+                pop_obj = getattr(obj, "Population", None)
+                if pop_obj is not None:
+                    val2 = getattr(pop_obj, attr, None)
+                    if val2 is not None and not isinstance(val2, bool):
+                        try:
+                            return int(val2)
+                        except (ValueError, TypeError):
+                            pass
+                if isinstance(obj, (tuple, list)) and len(obj) > 0:
+                    return _val(obj[0], attr)
+                return 0
 
-        from app.models.location import Population
+            from app.models.location import Population
 
-        try:
-            pop_records_raw = (
-                db.exec(select(Population).where(Population.location_id.in_(all_vil_ids))).all()
-                if all_vil_ids
-                else []
-            )
-            pop_records = pop_records_raw if isinstance(pop_records_raw, (list, tuple)) else []
-        except Exception:
-            pop_records = []
-
-        pop_reach = sum(_val(p, "population_total") for p in pop_records)
-        hh_reach = sum(_val(p, "households") for p in pop_records)
-
-        # Fallback to direct village population lookup if list is empty
-        if pop_reach == 0 and village_id:
             try:
-                t_pop = db.exec(
-                    select(Population).where(Population.location_id == village_id)
-                ).first()
+                pop_records_raw = (
+                    db.exec(select(Population).where(Population.location_id.in_(all_vil_ids))).all()
+                    if all_vil_ids
+                    else []
+                )
+                pop_records = pop_records_raw if isinstance(pop_records_raw, (list, tuple)) else []
             except Exception:
-                t_pop = None
-            if t_pop:
-                pop_reach = _val(t_pop, "population_total")
-                hh_reach = _val(t_pop, "households")
+                pop_records = []
+
+            pop_reach = sum(_val(p, "population_total") for p in pop_records)
+            hh_reach = sum(_val(p, "households") for p in pop_records)
+
+            # Fallback to direct village population lookup if list is empty
+            if pop_reach == 0 and village_id:
+                try:
+                    t_pop = db.exec(
+                        select(Population).where(Population.location_id == village_id)
+                    ).first()
+                except Exception:
+                    t_pop = None
+                if t_pop:
+                    pop_reach = _val(t_pop, "population_total")
+                    hh_reach = _val(t_pop, "households")
 
         # Explicit distance calculation without 100000 sentinel
         valid_distances = [
@@ -176,25 +202,31 @@ class FeasibilityService:
         risk_data_available = comp_data_available or mkt_data_available or infra_data_available
 
         # 2. Competition metrics
-        from app.models.business import BusinessCategory
+        if precomputed_comp_res is not None:
+            comp_res = precomputed_comp_res
+        else:
+            from app.models.business import BusinessCategory
 
-        cat_obj = (
-            _get_entity_by_id(db, BusinessCategory, business_category_id)
-            if business_category_id
-            else None
-        )
-        cat_name = cat_obj.name if cat_obj else None
+            cat_obj = (
+                _get_entity_by_id(db, BusinessCategory, business_category_id)
+                if business_category_id
+                else None
+            )
+            cat_name = cat_obj.name if cat_obj else None
 
-        comp_res = analyze_competition(
-            nearby_biz,
-            radius_km=max(radius_km, 25.0),
-            target_category_id=str(business_category_id) if business_category_id else None,
-            target_category_name=cat_name,
-        )
+            comp_res = analyze_competition(
+                nearby_biz,
+                radius_km=max(radius_km, 25.0),
+                target_category_id=str(business_category_id) if business_category_id else None,
+                target_category_name=cat_name,
+            )
         if not isinstance(comp_res, dict):
             logger.warning("analyze_competition returned unexpected type: %r", comp_res)
             comp_res = {}
-        calc_comp_density = float(comp_res.get("competition_density_per_km2", 0.0) or 0.0)
+        calc_comp_density = float(
+            comp_res.get("competition_density_per_km2", comp_res.get("competition_density", 0.0))
+            or 0.0
+        )
         direct_comp_count = int(
             comp_res.get(
                 "direct_competitor_count", comp_res.get("competitor_count", len(nearby_biz))
@@ -203,7 +235,10 @@ class FeasibilityService:
         )
 
         # 3. Infrastructure metrics
-        infra_res = analyze_relevant_infrastructure(nearby_facs)
+        if precomputed_infra_res is not None:
+            infra_res = precomputed_infra_res
+        else:
+            infra_res = analyze_relevant_infrastructure(nearby_facs)
         if not isinstance(infra_res, dict):
             logger.warning(
                 "analyze_relevant_infrastructure returned unexpected type: %r", infra_res
@@ -212,16 +247,21 @@ class FeasibilityService:
         facility_counts = infra_res.get("facility_counts_by_type", {}) or {}
 
         # 4. Risk indicators
-        risk_res = assess_market_risks(
-            competition_density=calc_comp_density,
-            facility_counts=facility_counts,
-            population_reach=pop_reach,
-            nearby_markets_count=len(nearby_mkts),
-            nearest_market_distance_km=nearest_dist,
-            single_market_name=single_mkt_name,
-            radius_km=radius_km,
-            data_available=risk_data_available,
-        )
+        if precomputed_risk_res is not None:
+            risk_res = precomputed_risk_res
+        else:
+            risk_res = assess_market_risks(
+                competition_density=calc_comp_density,
+                facility_counts=facility_counts,
+                price_volatility=price_volatility or "low",
+                is_seasonal=is_seasonal,
+                population_reach=pop_reach,
+                nearby_markets_count=len(nearby_mkts),
+                nearest_market_distance_km=nearest_dist,
+                single_market_name=single_mkt_name,
+                radius_km=radius_km,
+                data_available=risk_data_available,
+            )
         engine_risk_score = float(risk_res.get("risk_score", 0.0))
         risk_flags = risk_res.get("identified_risk_flags", [])
 

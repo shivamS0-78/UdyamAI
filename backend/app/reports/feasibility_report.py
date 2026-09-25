@@ -14,7 +14,7 @@ from app.models.finance import FinancialAnalysis
 from app.models.location import Village
 from app.models.market import MarketAnalysis
 from app.models.scheme import Scheme, SchemeMatch
-from app.schemes.matcher import estimate_subsidy_for_match
+from app.schemes.matcher import estimate_subsidy_for_match, latest_active_rules_by_scheme
 
 
 def assemble_feasibility_report_data(db: Session, analysis_run_id: UUID) -> dict[str, Any]:
@@ -50,13 +50,23 @@ def assemble_feasibility_report_data(db: Session, analysis_run_id: UUID) -> dict
         select(FinancialAnalysis).where(FinancialAnalysis.analysis_run_id == analysis_run_id)
     ).first()
 
+    # Batch the per-scheme lookups so a report with N matched schemes costs two queries
+    # instead of two per scheme.
+    matched_scheme_ids = [m.scheme_id for m in matches if m.scheme_id]
+    schemes_by_id: dict[UUID, Scheme] = {}
+    if matched_scheme_ids:
+        schemes_by_id = {
+            s.id: s for s in db.exec(select(Scheme).where(Scheme.id.in_(matched_scheme_ids))).all()
+        }
+    rules_by_scheme = latest_active_rules_by_scheme(db, matched_scheme_ids)
+
     schemes_data = []
     for match in matches:
-        sch = db.get(Scheme, match.scheme_id)
+        sch = schemes_by_id.get(match.scheme_id) if match.scheme_id else None
         if not sch:
             continue
         proj_cost = match.estimated_project_cost or 0.0
-        subsidy = estimate_subsidy_for_match(db, sch.id, proj_cost)
+        subsidy = estimate_subsidy_for_match(db, sch.id, proj_cost, rules_by_scheme=rules_by_scheme)
         subsidy_pct = round((subsidy / proj_cost) * 100, 1) if proj_cost > 0 and subsidy > 0 else 0
         schemes_data.append(
             {

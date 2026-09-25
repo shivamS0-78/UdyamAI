@@ -33,7 +33,7 @@ class Settings(BaseSettings):
 
     # AI / LLM Configuration Placeholders
     AI_PROVIDER: str = "gemini"
-    AI_MODEL: str | None = "gemini-3.6-flash"
+    AI_MODEL: str | None = "gemini-2.5-flash"
     OPENAI_API_KEY: str | None = None
     GEMINI_API_KEY: str | None = None
     SARVAM_API_KEY: str | None = None

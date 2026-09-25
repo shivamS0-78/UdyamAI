@@ -111,6 +111,20 @@ class TestAnalysisOrchestrator:
         mock_mkt_res.risks.overall_market_risk_score = 0.3
         mock_mkt_res.risks.risk_level = "low"
         mock_mkt_res.overall_market_score = 0.82
+        mock_mkt_res.market_indicators = {
+            "competition": {
+                "competitor_count": 5,
+                "competitor_density": 0.5,
+                "businesses_within_5km": 2,
+                "businesses_within_10km": 4,
+                "total_businesses_in_radius": 12,
+                "category_distribution": {},
+                "identified_market_gaps": [],
+                "quality_indicator": {},
+                "data_completeness": "medium",
+                "provenance": [],
+            }
+        }
 
         mock_location_market_res = MagicMock()
         mock_location_market_res.radius_results = [mock_mkt_res]
@@ -180,6 +194,14 @@ class TestAnalysisOrchestrator:
         mock_calc_fin.assert_called_once()
         fin_call_args, fin_call_kwargs = mock_calc_fin.call_args
         assert fin_call_kwargs.get("session") == mock_db
+
+        # The market step already ran the identical competition analysis, so the
+        # orchestrator hands its metrics over instead of paying for a second spatial scan.
+        comp_call_kwargs = mock_comp_loc.call_args.kwargs
+        assert (
+            comp_call_kwargs["precomputed_comp_res"]
+            == mock_mkt_res.market_indicators["competition"]
+        )
 
     @patch("app.services.analysis_orchestrator.AnalysisService.verify_business_category")
     @patch("app.services.analysis_orchestrator.AnalysisService.verify_location")

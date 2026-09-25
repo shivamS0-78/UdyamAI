@@ -190,9 +190,9 @@ export default function ChatWidget() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-[1100] flex flex-col items-end gap-3">
+    <div className="fixed bottom-24 right-4 sm:bottom-6 sm:right-6 z-[1100] flex flex-col items-end gap-3">
       {open && (
-        <div className="flex h-[min(560px,80vh)] w-[min(420px,calc(100vw-2.5rem))] flex-col overflow-hidden rounded-[28px] border border-border bg-white dark:bg-[#161B22] shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+        <div className="flex h-[min(560px,80vh)] w-[min(420px,calc(100vw-2rem))] flex-col overflow-hidden rounded-[28px] border border-border bg-white dark:bg-[#161B22] shadow-2xl animate-in fade-in zoom-in-95 duration-200">
           {/* Header */}
           <div className="flex items-center justify-between bg-gradient-to-r from-primary to-[#0F7D57] px-5 py-4 text-white">
             <div className="flex items-center gap-3">

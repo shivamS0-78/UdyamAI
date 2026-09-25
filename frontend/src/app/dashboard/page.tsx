@@ -3,7 +3,7 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Loader2, Sparkles, ArrowLeft, Download, FileText, CheckCircle2, Volume2, VolumeX } from 'lucide-react';
+import { Loader2, Sparkles, ArrowLeft, Download, FileText, CheckCircle2, Volume2, VolumeX, ShieldCheck } from 'lucide-react';
 import AppShell from '@/components/ui/AppShell';
 import DashboardNav, { DashboardSection } from '@/components/dashboard/DashboardNav';
 import FinancialSection from '@/components/dashboard/FinancialSection';
@@ -13,7 +13,12 @@ import SchemeSection from '@/components/dashboard/SchemeSection';
 import RiskSection from '@/components/dashboard/RiskSection';
 import MapContainer from '@/components/maps/MapContainer';
 import UserOverview from '@/components/dashboard/UserOverview';
-import { getConsolidatedAnalysis, downloadAnalysisPdf, ConsolidatedAnalysisData } from '@/lib/api';
+import {
+  getConsolidatedAnalysis,
+  downloadAnalysisPdf,
+  waitForAnalysisCompletion,
+  ConsolidatedAnalysisData,
+} from '@/lib/api';
 import { useTranslation } from '@/stores/languageStore';
 import Card from '@/components/ui/Card';
 import StatusBadge, { StatusType } from '@/components/ui/StatusBadge';
@@ -39,6 +44,8 @@ function isValidAnalysisData(obj: any): obj is ConsolidatedAnalysisData {
   return !!(
     obj &&
     typeof obj === 'object' &&
+    obj.status !== 'pending' &&
+    obj.status !== 'running' &&
     (obj.feasibility || obj.analysis_id || obj.business)
   );
 }
@@ -46,7 +53,14 @@ function isValidAnalysisData(obj: any): obj is ConsolidatedAnalysisData {
 function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { profile, user } = useAuth();
+  const { profile, user, loading: authLoading } = useAuth();
+
+  // If authenticated user has not completed profile setup, redirect to /setup
+  useEffect(() => {
+    if (!authLoading && user && (!profile?.name || !profile?.business_name)) {
+      router.replace('/setup');
+    }
+  }, [authLoading, user, profile, router]);
   const [activeSection, setActiveSection] = useState<DashboardSection>('overview');
   const [data, setData] = useState<ConsolidatedAnalysisData | null>(null);
   const [resolvedAnalysisId, setResolvedAnalysisId] = useState<string | null>(null);
@@ -101,7 +115,7 @@ function DashboardContent() {
 
     async function loadAnalysis() {
       try {
-        const res = await getConsolidatedAnalysis(requestedId);
+        const res = await getConsolidatedAnalysis(requestedId, true);
         const resId = res?.analysis_id || (res as any)?.id;
         if (
           !isCancelled &&
@@ -346,7 +360,12 @@ function DashboardContent() {
                   </div>
                   <div className="flex items-center gap-2">
                     <span className={`w-2 h-2 rounded-full ${data?.ai_advice?.model_name && data.ai_advice.model_name !== 'unavailable' ? 'bg-primary' : 'bg-slate-300 dark:bg-slate-700'}`} />
-                    <span className="text-foreground">AI Intelligence</span>
+                    <span className="text-foreground flex items-center gap-1.5">
+                      AI Intelligence
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30">
+                        <ShieldCheck className="h-3 w-3" /> {t('dash.ragVerified', 'Verified by RAG')}
+                      </span>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -355,10 +374,14 @@ function DashboardContent() {
             {/* AI Advisor Strategic Summary */}
             {advisorSummary && (
               <Card padding="lg" className="border-border bg-white dark:bg-[#161B22] rounded-[24px] shadow-subtle">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+                  <div className="flex items-center gap-2.5">
                     <Sparkles className="h-5 w-5 text-primary" />
-                    <h3 className="text-base font-bold text-foreground">{t('dash.aiAdvisor')}</h3>
+                    <h3 className="text-base font-bold text-foreground">{t('dash.aiAdvisor', 'AI Advisor Intelligence (RAG Verified)')}</h3>
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 shadow-xs">
+                      <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                      {t('dash.ragVerified', 'Verified by RAG')}
+                    </span>
                   </div>
 
                   {/* Read Aloud Button */}
@@ -395,7 +418,13 @@ function DashboardContent() {
             {/* Recommendations / Next Steps */}
             {advisorRecommendations.length > 0 && (
               <Card padding="lg" className="border-border bg-white dark:bg-[#161B22] rounded-[24px] shadow-subtle">
-                <h3 className="text-base font-bold text-foreground mb-4">{t('dash.nextSteps')}</h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-base font-bold text-foreground">{t('dash.nextSteps', 'Recommended Strategic Next Steps')}</h3>
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30">
+                    <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                    {t('dash.ragVerified', 'Verified by RAG')}
+                  </span>
+                </div>
                 <ul className="space-y-3">
                   {advisorRecommendations.map((rec: string, i: number) => (
                     <li key={i} className="flex items-start gap-3 text-sm text-foreground-muted">

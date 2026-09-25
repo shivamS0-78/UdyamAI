@@ -250,8 +250,16 @@ def assess_market_risks(
         )
 
     # 5. limited_infrastructure
-    financial_count = facility_counts.get("bank", 0) + facility_counts.get("atm", 0)
-    logistics_count = facility_counts.get("cold_storage", 0) + facility_counts.get("warehouse", 0)
+    financial_count = (
+        facility_counts.get("bank", 0)
+        + facility_counts.get("bank_branch", 0)
+        + facility_counts.get("atm", 0)
+    )
+    logistics_count = (
+        facility_counts.get("cold_storage", 0)
+        + facility_counts.get("warehouse", 0)
+        + facility_counts.get("processing_unit", 0)
+    )
 
     if financial_count == 0 or logistics_count == 0:
         if financial_count == 0 and logistics_count == 0:

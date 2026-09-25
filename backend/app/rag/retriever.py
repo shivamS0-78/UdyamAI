@@ -3,8 +3,11 @@ import logging
 import math
 import re
 from datetime import date
+from typing import Any
 from uuid import UUID
 
+from sqlalchemy import Float, bindparam, literal
+from sqlalchemy.orm import defer
 from sqlmodel import Session, select
 
 from app.config import settings
@@ -156,6 +159,136 @@ def _merge_results(
     return merged[:top_k]
 
 
+def _drop_inverted_date_range_documents(
+    pairs: list[tuple[DocumentChunk, Document]],
+) -> list[tuple[DocumentChunk, Document]]:
+    """Drop candidates whose document has effective_from > effective_until."""
+    usable: list[tuple[DocumentChunk, Document]] = []
+    for chunk, doc in pairs:
+        if doc.effective_from and doc.effective_until and doc.effective_from > doc.effective_until:
+            logger.error(
+                f"Document '{doc.id}' ({doc.title}) has invalid/inverted date range "
+                f"({doc.effective_from} > {doc.effective_until}). Excluding from retrieval results."
+            )
+            continue
+        usable.append((chunk, doc))
+
+    if pairs and not usable:
+        logger.warning("All matching documents excluded due to invalid effective date ranges.")
+    return usable
+
+
+def _score_candidates_in_python(
+    pairs: list[tuple[DocumentChunk, Document]],
+    query_vector: list[float],
+    threshold: float,
+) -> list[tuple[DocumentChunk, Document, float]]:
+    """Brute-force cosine scoring, used when the pgvector index cannot serve the query."""
+    scored: list[tuple[DocumentChunk, Document, float]] = []
+    skipped_count = 0
+    invalid_dim_count = 0
+
+    for chunk, doc in pairs:
+        emb = chunk.embedding
+        if emb is None:
+            skipped_count += 1
+            logger.debug(f"Skipping chunk {chunk.id}: missing vector embedding.")
+            continue
+
+        if isinstance(emb, str):
+            try:
+                emb = json.loads(emb)
+            except Exception:
+                try:
+                    emb = [float(x.strip()) for x in emb.strip("[]()").split(",") if x.strip()]
+                except Exception:
+                    pass
+        elif hasattr(emb, "tolist"):
+            emb = emb.tolist()
+
+        if not isinstance(emb, (list, tuple)) or len(emb) != EXPECTED_EMBEDDING_DIMENSION:
+            invalid_dim_count += 1
+            logger.warning(
+                f"Skipping chunk {chunk.id}: embedding dimension {len(emb) if hasattr(emb, '__len__') else 'unknown'} "
+                f"!= expected {EXPECTED_EMBEDDING_DIMENSION}."
+            )
+            continue
+
+        score = _cosine_similarity(emb, query_vector)
+        if score >= threshold:
+            scored.append((chunk, doc, score))
+
+    if skipped_count > 0:
+        logger.info(f"Skipped {skipped_count} chunks due to missing embeddings.")
+    if invalid_dim_count > 0:
+        logger.warning(f"Skipped {invalid_dim_count} chunks due to vector dimension mismatch.")
+    return scored
+
+
+def _supports_pgvector_ann(db: Session) -> bool:
+    """True when the session is PostgreSQL-backed with a real pgvector column type.
+
+    Everywhere else (SQLite in dev/tests, or the ``pgvector`` package absent) the
+    ``<=>`` operator and its HNSW index do not exist, so retrieval has to fall back
+    to scoring candidates in Python.
+    """
+    bind = getattr(db, "bind", None)
+    if getattr(getattr(bind, "dialect", None), "name", None) != "postgresql":
+        return False
+    return type(DocumentChunk.__table__.c.embedding.type).__module__.startswith("pgvector")
+
+
+def _pgvector_candidates(
+    db: Session,
+    stmt: Any,
+    query_vector: list[float],
+    top_k: int,
+    threshold: float,
+) -> list[tuple[DocumentChunk, Document, float]] | None:
+    """Rank candidates with the pgvector cosine operator.
+
+    Returns the nearest chunks (score >= *threshold*) ordered by similarity, or ``None``
+    when pgvector is unavailable or the query failed — in which case the caller falls
+    back to in-Python scoring. Filtering in the database keeps the 1536-dimension
+    embeddings off the wire: the previous approach transferred every chunk of every
+    active document just to score them locally.
+    """
+    if not _supports_pgvector_ann(db):
+        return None
+
+    vector_type = DocumentChunk.__table__.c.embedding.type
+    distance = DocumentChunk.embedding.op("<=>", return_type=Float)(
+        bindparam("query_vector", query_vector, type_=vector_type)
+    )
+
+    ann_stmt = (
+        stmt.add_columns((literal(1.0) - distance).label("similarity"))
+        # The embeddings themselves are not needed downstream, so keep them out of the
+        # result set (a single vector is ~20KB as text).
+        .options(defer(DocumentChunk.embedding))
+        .where(DocumentChunk.embedding.is_not(None))
+        .order_by(distance)
+        .limit(top_k)
+    )
+
+    try:
+        # A savepoint keeps the caller's transaction usable if the ANN query fails.
+        with db.begin_nested():
+            rows = db.exec(ann_stmt).all()
+    except Exception as exc:
+        logger.warning(
+            f"pgvector similarity search failed ({exc}); falling back to in-Python scoring."
+        )
+        return None
+
+    candidates: list[tuple[DocumentChunk, Document, float]] = []
+    for chunk, doc, similarity in rows:
+        score = float(similarity)
+        if score >= threshold:
+            candidates.append((chunk, doc, score))
+    return candidates
+
+
 def retrieve_evidence(
     db: Session,
     query: str | RAGQueryRequest,
@@ -249,71 +382,28 @@ def retrieve_evidence(
             (Document.effective_until.is_(None)) | (Document.effective_until >= effective_date),
         )
 
-    results = db.exec(stmt).all()
+    # 3. Rank candidates, preferring the pgvector index over an in-Python table scan.
+    pgvector_candidates = _pgvector_candidates(db, stmt, query_vector, top_k, threshold)
 
-    if not results:
-        logger.info("No active documents matched the requested metadata filters.")
-        return RAGQueryResponse(status="no_relevant_evidence", evidence=[])
+    if pgvector_candidates is not None:
+        if not pgvector_candidates:
+            logger.info(f"No evidence chunks satisfied similarity threshold ({threshold}).")
+            return RAGQueryResponse(status="no_relevant_evidence", evidence=[])
+        scored_candidates = pgvector_candidates
+    else:
+        results = db.exec(stmt).all()
 
-    # Exclude documents with invalid/inverted effective dates
-    bad_doc_ids: set[UUID] = set()
-    for _, doc in results:
-        if doc.effective_from and doc.effective_until and doc.effective_from > doc.effective_until:
-            logger.error(
-                f"Document '{doc.id}' ({doc.title}) has invalid/inverted date range "
-                f"({doc.effective_from} > {doc.effective_until}). Excluding from retrieval results."
-            )
-            bad_doc_ids.add(doc.id)
-
-    if bad_doc_ids:
-        results = [(c, d) for c, d in results if d.id not in bad_doc_ids]
         if not results:
-            logger.warning("All matching documents excluded due to invalid effective date ranges.")
+            logger.info("No active documents matched the requested metadata filters.")
             return RAGQueryResponse(status="no_relevant_evidence", evidence=[])
 
-    # 3. Calculate similarity score for each candidate chunk and apply score threshold
-    scored_candidates: list[tuple[DocumentChunk, Document, float]] = []
-    skipped_count = 0
-    invalid_dim_count = 0
+        scored_candidates = _score_candidates_in_python(
+            _drop_inverted_date_range_documents(results), query_vector, threshold
+        )
 
-    for chunk, doc in results:
-        emb = chunk.embedding
-        if emb is None:
-            skipped_count += 1
-            logger.debug(f"Skipping chunk {chunk.id}: missing vector embedding.")
-            continue
-
-        if isinstance(emb, str):
-            try:
-                emb = json.loads(emb)
-            except Exception:
-                try:
-                    emb = [float(x.strip()) for x in emb.strip("[]()").split(",") if x.strip()]
-                except Exception:
-                    pass
-        elif hasattr(emb, "tolist"):
-            emb = emb.tolist()
-
-        if not isinstance(emb, (list, tuple)) or len(emb) != EXPECTED_EMBEDDING_DIMENSION:
-            invalid_dim_count += 1
-            logger.warning(
-                f"Skipping chunk {chunk.id}: embedding dimension {len(emb) if hasattr(emb, '__len__') else 'unknown'} "
-                f"!= expected {EXPECTED_EMBEDDING_DIMENSION}."
-            )
-            continue
-
-        score = _cosine_similarity(emb, query_vector)
-        if score >= threshold:
-            scored_candidates.append((chunk, doc, score))
-
-    if skipped_count > 0:
-        logger.info(f"Skipped {skipped_count} chunks due to missing embeddings.")
-    if invalid_dim_count > 0:
-        logger.warning(f"Skipped {invalid_dim_count} chunks due to vector dimension mismatch.")
-
-    if not scored_candidates:
-        logger.info(f"No evidence chunks satisfied similarity threshold ({threshold}).")
-        return RAGQueryResponse(status="no_relevant_evidence", evidence=[])
+        if not scored_candidates:
+            logger.info(f"No evidence chunks satisfied similarity threshold ({threshold}).")
+            return RAGQueryResponse(status="no_relevant_evidence", evidence=[])
 
     # 4. Sort by relevance score descending
     scored_candidates.sort(key=lambda item: item[2], reverse=True)

@@ -16,8 +16,6 @@ import {
   MessageSquare,
   PiggyBank,
   Receipt,
-  Search,
-  Bell,
   Settings,
   Shield,
   Sparkles,
@@ -38,6 +36,7 @@ import {
 import { useAuth } from '@/components/auth/AuthProvider';
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 import DarkModeToggle from '@/components/ui/DarkModeToggle';
+import PWAInstallButton from '@/components/ui/PWAInstallButton';
 import { useLanguageStore, useTranslation } from '@/stores/languageStore';
 import Logo from '@/components/ui/Logo';
 
@@ -216,27 +215,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             })}
           </nav>
 
-          {/* Right Controls: Search, Notification, Language, Dark Mode, Profile */}
+          {/* Right Controls: Language, Dark Mode, Profile */}
           <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 z-10">
-            {/* Search Pill */}
-            <Link
-              href="/schemes"
-              className="h-10 w-10 rounded-full bg-[#F6F7F9] dark:bg-[#1C2128] border border-border flex items-center justify-center text-foreground-muted hover:text-foreground hover:bg-neutral-100 dark:hover:bg-[#272D37] transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm hidden sm:flex"
-              title="Search Schemes & Directory"
-            >
-              <Search className="h-4.5 w-4.5" />
-            </Link>
-
-            {/* Notifications Pill */}
-            <Link
-              href="/settings"
-              className="relative h-10 w-10 rounded-full bg-[#F6F7F9] dark:bg-[#1C2128] border border-border flex items-center justify-center text-foreground-muted hover:text-foreground hover:bg-neutral-100 dark:hover:bg-[#272D37] transition-all duration-200 hover:scale-105 active:scale-95 shadow-sm"
-              title="Notifications & Alerts"
-            >
-              <Bell className="h-4.5 w-4.5" />
-              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary ring-2 ring-white dark:ring-[#161B22] animate-pulse" />
-            </Link>
-
             {/* Language Switcher */}
             <div className="hidden sm:block transition-transform duration-200 hover:scale-105 active:scale-95">
               <LanguageSwitcher compact />
@@ -481,6 +461,134 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           {children}
         </main>
       </div>
+
+      {/* ========================================================================= */}
+      {/* MOBILE SIDE NAVIGATION DRAWER (Slide-over)                                */}
+      {/* ========================================================================= */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity duration-200"
+            onClick={() => setMobileOpen(false)}
+            aria-hidden="true"
+          />
+
+          {/* Drawer Panel */}
+          <div className="fixed inset-y-0 left-0 flex max-w-full">
+            <div className="w-screen max-w-xs sm:max-w-sm bg-white dark:bg-[#161B22] border-r border-border shadow-2xl flex flex-col justify-between overflow-y-auto p-5 transition-transform duration-300">
+              <div className="space-y-5">
+                {/* Header: Brand + Close */}
+                <div className="flex items-center justify-between pb-3 border-b border-border">
+                  <Logo href="/dashboard" size="md" />
+                  <button
+                    type="button"
+                    onClick={() => setMobileOpen(false)}
+                    className="p-2 rounded-xl text-foreground-muted hover:text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                    aria-label="Close Navigation"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+
+                {/* PWA Download Banner */}
+                <PWAInstallButton variant="banner" className="w-full shadow-xs" />
+
+                {/* User Profile Card */}
+                {user && (
+                  <Link
+                    href="/profile"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-[#1C2128] border border-border hover:border-primary/40 transition"
+                  >
+                    <div className="h-10 w-10 rounded-full bg-primary/15 text-primary flex items-center justify-center font-black text-sm uppercase shrink-0 border border-primary/20">
+                      {userName.slice(0, 2)}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-bold text-foreground truncate">{userName}</p>
+                      <p className="text-xs text-foreground-muted truncate">
+                        {profile?.business_name || user?.email || 'Active Member'}
+                      </p>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-foreground-muted shrink-0" />
+                  </Link>
+                )}
+
+                {/* Navigation Modules & Links */}
+                <div className="space-y-4 pt-1">
+                  {NAV_MODULES.map((mod) => {
+                    const ModIcon = mod.icon;
+                    const isModActive = activeModule.id === mod.id;
+
+                    return (
+                      <div key={mod.id} className="space-y-1">
+                        <div className="flex items-center gap-2 px-2 py-1 text-xs font-bold uppercase tracking-wider text-foreground-muted">
+                          <ModIcon className="h-3.5 w-3.5 text-primary" />
+                          <span>{t(mod.labelKey, mod.defaultLabel)}</span>
+                        </div>
+                        <div className="space-y-0.5 pl-2">
+                          {mod.items.map((item) => {
+                            const isItemActive = pathname === item.href;
+                            const ItemIcon = item.icon;
+                            return (
+                              <Link
+                                key={item.href}
+                                href={item.href}
+                                onClick={() => setMobileOpen(false)}
+                                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                                  isItemActive
+                                    ? 'bg-primary text-white shadow-xs font-bold'
+                                    : 'text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-foreground'
+                                }`}
+                              >
+                                <ItemIcon className="h-4 w-4 shrink-0" />
+                                <span className="truncate">{t(item.labelKey, item.shortLabel)}</span>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Bottom Drawer Actions */}
+              <div className="pt-4 mt-6 border-t border-border space-y-3">
+                <div className="flex items-center justify-between px-2">
+                  <span className="text-xs font-bold text-foreground-muted uppercase tracking-wider">Preferences</span>
+                  <div className="flex items-center gap-2">
+                    <LanguageSwitcher compact />
+                    <DarkModeToggle />
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1 pt-1">
+                  <Link
+                    href="/settings"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition"
+                  >
+                    <Settings className="h-4 w-4 text-foreground-muted" />
+                    <span>{t('nav.settings')}</span>
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileOpen(false);
+                      void handleSignOut();
+                    }}
+                    className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition text-left"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span>{t('app.signOut')}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ========================================================================= */}
       {/* MOBILE BOTTOM NAVIGATION BAR                                              */}

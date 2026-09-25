@@ -13,6 +13,7 @@ from openai import (
     RateLimitError,
 )
 
+from app.cache import embedding_cache_key, get_cache
 from app.config import settings
 from app.rag.token_counter import count_tokens, count_tokens_batch, estimate_embedding_cost
 
@@ -145,11 +146,23 @@ def get_openai_client() -> OpenAI:
     return _client
 
 
-def generate_embedding(text: str, max_retries: int = 5, base_delay: float = 1.0) -> list[float]:
+def generate_embedding(
+    text: str, max_retries: int = 5, base_delay: float = 1.0, use_cache: bool = False
+) -> list[float]:
     """
     Generate an embedding using text-embedding-3-small (1536 dimensions) for a single text.
     Includes rate limiting, budget checks, and retry with exponential backoff and jitter.
     """
+    cleaned_text = text.replace("\n", " ").strip()
+    cache_key = embedding_cache_key(cleaned_text, settings.RAG_EMBEDDING_MODEL)
+    if use_cache:
+        try:
+            cached_vec = get_cache().get(cache_key)
+            if cached_vec and isinstance(cached_vec, list) and len(cached_vec) == 1536:
+                return cached_vec
+        except Exception as exc:
+            logger.debug("Embedding cache read failed: %s", exc)
+
     client = get_openai_client()
     tokens = count_tokens(text)
 
@@ -157,7 +170,6 @@ def generate_embedding(text: str, max_retries: int = 5, base_delay: float = 1.0)
     rate_limiter.check_token_budget(tokens)
     rate_limiter.wait_for_rate_limit(tokens)
 
-    cleaned_text = text.replace("\n", " ").strip()
     logger.debug(f"Generating single embedding ({tokens} tokens) for text: {cleaned_text[:30]}...")
 
     attempt = 0
@@ -171,6 +183,11 @@ def generate_embedding(text: str, max_retries: int = 5, base_delay: float = 1.0)
                 raise ValueError(
                     f"Generated embedding dimension is {len(embedding)}, expected 1536."
                 )
+            if use_cache:
+                try:
+                    get_cache().set(cache_key, embedding, ttl=settings.CACHE_TTL)
+                except Exception:
+                    pass
             return embedding
         except (RateLimitError, APITimeoutError, APIConnectionError, InternalServerError) as e:
             if (

@@ -32,7 +32,7 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
-const themeScript = `
+const pwaAndThemeScript = `
   (function() {
     try {
       var stored = localStorage.getItem('udyam_theme');
@@ -45,6 +45,13 @@ const themeScript = `
         document.documentElement.style.colorScheme = 'light';
       }
     } catch(e) {}
+
+    window.__pwaPrompt = null;
+    window.addEventListener('beforeinstallprompt', function(e) {
+      e.preventDefault();
+      window.__pwaPrompt = e;
+      window.dispatchEvent(new CustomEvent('pwa-prompt-captured'));
+    });
   })();
 `;
 
@@ -56,7 +63,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script dangerouslySetInnerHTML={{ __html: pwaAndThemeScript }} />
       </head>
       <body>
         <ServiceWorkerRegister />

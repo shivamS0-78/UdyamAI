@@ -102,7 +102,8 @@ class AnalysisRunCreate(BaseModel):
         description="Desired total project setup cost in INR (> 0)",
     )
     language: SupportedLanguage = Field(
-        default=SupportedLanguage.EN, description="Preferred report language ('en', 'hi', 'mr')"
+        default=SupportedLanguage.EN,
+        description="Preferred report language ('en', 'hi', 'mr', 'ta', 'te', 'kn', 'gu', 'bn', 'pa', 'ml')",
     )
 
 

@@ -27,6 +27,19 @@ SUPPORTED_LANGUAGES = {
     "pa-IN": "pa-IN",
     "or-IN": "or-IN",
     "as-IN": "as-IN",
+    # 2-letter aliases
+    "hi": "hi-IN",
+    "mr": "mr-IN",
+    "en": "en-IN",
+    "bn": "bn-IN",
+    "te": "te-IN",
+    "ta": "ta-IN",
+    "gu": "gu-IN",
+    "kn": "kn-IN",
+    "ml": "ml-IN",
+    "pa": "pa-IN",
+    "or": "or-IN",
+    "as": "as-IN",
 }
 
 

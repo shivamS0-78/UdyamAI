@@ -38,6 +38,7 @@ from app.schemas.market import (
     LocationMarketAnalysisResponse,
     MarketProvenanceInfo,
     MarketRiskAssessmentResponse,
+    NearbyCompetitorSummary,
     NearbyInfrastructureSummary,
     NearbyMarketSummary,
     RadiusMarketAnalysisResult,
@@ -300,7 +301,6 @@ class MarketService:
                 lat=lat,
                 lng=lng,
                 radius_km=max_radius,
-                category_id=business_category_id,
                 limit=500,
             )
         except Exception as e:
@@ -481,10 +481,34 @@ class MarketService:
             )
             single_mkt_name = nearby_mkts[0].get("name") if len(nearby_mkts) == 1 else None
 
+            is_cat_seasonal = False
+            if target_cat_name:
+                t_lower = target_cat_name.lower()
+                is_cat_seasonal = any(
+                    k in t_lower
+                    for k in [
+                        "crop",
+                        "farm",
+                        "fruit",
+                        "vegetable",
+                        "grain",
+                        "agro",
+                        "sugar",
+                        "cotton",
+                        "onion",
+                        "spice",
+                        "dairy",
+                        "poultry",
+                        "fish",
+                    ]
+                )
+
             risk_res = assess_market_risks(
                 competition_density=comp_res["competition_density_per_km2"],
                 facility_counts=infra_res["facility_counts_by_type"],
-                price_volatility=pricing_res["price_volatility"],
+                price_volatility=pricing_res.get("price_volatility", "low"),
+                price_volatility_score=pricing_res.get("price_volatility_score"),
+                is_seasonal=is_cat_seasonal,
                 population_reach=pop_reach,
                 nearby_markets_count=len(nearby_mkts),
                 nearest_market_distance_km=nearest_mkt_dist,
@@ -527,6 +551,19 @@ class MarketService:
                     radius_provenance_map[pkey] = prov_obj
                     global_provenance[pkey] = prov_obj
 
+            competitor_summaries = [
+                NearbyCompetitorSummary(
+                    id=UUID(item["id"]) if item.get("id") else None,
+                    name=item.get("name"),
+                    category=item.get("category"),
+                    distance_km=item.get("distance_km", 0.0),
+                    verified=item.get("verified", False),
+                    latitude=item.get("latitude"),
+                    longitude=item.get("longitude"),
+                )
+                for item in comp_res.get("direct_competitors", [])
+            ]
+
             radius_result = RadiusMarketAnalysisResult(
                 radius_km=r,
                 estimated_population_reach=pop_reach,
@@ -537,6 +574,8 @@ class MarketService:
                 nearby_markets=market_summaries,
                 relevant_infrastructure_count=len(nearby_facs),
                 relevant_infrastructure=infra_summaries,
+                nearby_competitors_count=len(competitor_summaries),
+                nearby_competitors=competitor_summaries,
                 market_indicators=indicators_dict,
                 provenance=list(radius_provenance_map.values()),
             )
@@ -619,55 +658,66 @@ class MarketService:
         radius_km: float = 10.0,
         business_category_id: UUID | None = None,
         category_name: str | None = None,
+        precomputed_comp_res: dict[str, Any] | None = None,
     ) -> CompetitionAnalysisDetailResponse:
-        """Perform standalone competition analysis for a location and business category."""
-        target_lat = lat
-        target_lng = lng
+        """Perform standalone competition analysis for a location and business category.
 
-        if (target_lat is None or target_lng is None) and village_id is not None:
-            village = _get_entity_by_id(db, Village, village_id)
-            if not village:
-                raise HTTPException(
-                    status_code=404, detail=f"Village with id {village_id} not found"
-                )
-            if village.latitude is None or village.longitude is None:
-                target_lat, target_lng = LocationService.ensure_village_coordinates(db, village)
-            else:
-                target_lat = village.latitude
-                target_lng = village.longitude
-
-        if target_lat is None or target_lng is None:
-            raise HTTPException(
-                status_code=400,
-                detail="Location coordinates (lat, lng) or a valid village_id are required for competition analysis.",
-            )
-
-        # Resolve category name if ID provided
+        When ``precomputed_comp_res`` is supplied the spatial lookup is skipped and the
+        supplied ``analyze_competition`` output is reused instead. Callers that already ran
+        the identical category/radius competition analysis (e.g. the village market step of
+        the analysis orchestrator) avoid paying for a second full spatial scan.
+        """
+        # Resolve category name if ID provided (a primary-key lookup, kept cheap enough to
+        # run even on the precomputed path so ``target_category`` is still populated).
         resolved_category_name = category_name
         if business_category_id and not resolved_category_name:
             b_cat = _get_entity_by_id(db, BusinessCategory, business_category_id)
             if b_cat:
                 resolved_category_name = b_cat.name
 
-        try:
-            nearby_businesses = find_nearby_businesses(
-                db,
-                lat=target_lat,
-                lng=target_lng,
-                radius_km=radius_km,
-                category_id=business_category_id,
-                limit=500,
-            )
-        except Exception as e:
-            logger.warning(f"Spatial lookup failed for competition analysis: {e}")
-            nearby_businesses = []
+        if precomputed_comp_res is not None:
+            comp_res = precomputed_comp_res
+        else:
+            target_lat = lat
+            target_lng = lng
 
-        comp_res = analyze_competition(
-            nearby_businesses,
-            radius_km=radius_km,
-            target_category_id=str(business_category_id) if business_category_id else None,
-            target_category_name=resolved_category_name,
-        )
+            if (target_lat is None or target_lng is None) and village_id is not None:
+                village = _get_entity_by_id(db, Village, village_id)
+                if not village:
+                    raise HTTPException(
+                        status_code=404, detail=f"Village with id {village_id} not found"
+                    )
+                if village.latitude is None or village.longitude is None:
+                    target_lat, target_lng = LocationService.ensure_village_coordinates(db, village)
+                else:
+                    target_lat = village.latitude
+                    target_lng = village.longitude
+
+            if target_lat is None or target_lng is None:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Location coordinates (lat, lng) or a valid village_id are required for competition analysis.",
+                )
+
+            try:
+                nearby_businesses = find_nearby_businesses(
+                    db,
+                    lat=target_lat,
+                    lng=target_lng,
+                    radius_km=radius_km,
+                    category_id=business_category_id,
+                    limit=500,
+                )
+            except Exception as e:
+                logger.warning(f"Spatial lookup failed for competition analysis: {e}")
+                nearby_businesses = []
+
+            comp_res = analyze_competition(
+                nearby_businesses,
+                radius_km=radius_km,
+                target_category_id=str(business_category_id) if business_category_id else None,
+                target_category_name=resolved_category_name,
+            )
 
         provenance_objs = [
             MarketProvenanceInfo(
@@ -682,17 +732,20 @@ class MarketService:
         ]
 
         return CompetitionAnalysisDetailResponse(
-            competitor_count=comp_res["competitor_count"],
-            competitor_density=comp_res["competitor_density"],
-            businesses_within_5km=comp_res["businesses_within_5km"],
-            businesses_within_10km=comp_res["businesses_within_10km"],
-            total_businesses_in_radius=comp_res["total_businesses_in_radius"],
+            competitor_count=int(comp_res.get("competitor_count", 0) or 0),
+            competitor_density=float(comp_res.get("competitor_density", 0.0) or 0.0),
+            businesses_within_5km=int(comp_res.get("businesses_within_5km", 0) or 0),
+            businesses_within_10km=int(comp_res.get("businesses_within_10km", 0) or 0),
+            total_businesses_in_radius=int(comp_res.get("total_businesses_in_radius", 0) or 0),
             target_category=resolved_category_name
             or (str(business_category_id) if business_category_id else None),
-            category_distribution=comp_res["category_distribution"],
-            identified_market_gaps=comp_res["identified_market_gaps"],
-            quality_indicator=comp_res["quality_indicator"],
-            data_confidence=comp_res["data_completeness"],
+            category_distribution=comp_res.get("category_distribution") or {},
+            identified_market_gaps=comp_res.get("identified_market_gaps") or [],
+            quality_indicator=comp_res.get("quality_indicator") or {},
+            direct_competitors=comp_res.get("direct_competitors") or [],
+            nearest_competitor_distance_km=comp_res.get("nearest_competitor_distance_km"),
+            competition_safety_margin=comp_res.get("competition_safety_margin"),
+            data_confidence=str(comp_res.get("data_completeness", "medium")),
             provenance=provenance_objs,
         )
 

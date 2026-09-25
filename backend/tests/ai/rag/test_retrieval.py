@@ -1,16 +1,21 @@
 from datetime import date
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 from uuid import uuid4
 
 import pytest
-from sqlmodel import Session, create_engine
+from sqlalchemy.dialects import postgresql
+from sqlmodel import Session, create_engine, select
 
 from app.config import settings
 from app.models.rag import Document, DocumentChunk
 from app.models.scheme import Scheme
 from app.rag.citations import build_source_metadata, format_evidence_item
 from app.rag.document_loader import load_document, query_rag_pipeline
-from app.rag.retriever import retrieve_evidence
+from app.rag.retriever import (
+    _pgvector_candidates,
+    _supports_pgvector_ann,
+    retrieve_evidence,
+)
 from app.schemas.rag import RAGQueryRequest, RAGQueryResponse
 
 settings.OPENAI_API_KEY = "mock-openai-key-for-testing"
@@ -507,3 +512,79 @@ def test_exclude_documents_with_inverted_dates(mock_gen_embedding, db_session: S
     response = retrieve_evidence(db=db_session, query="test query", score_threshold=0.1)
     assert response.status == "no_relevant_evidence"
     assert len(response.evidence) == 0
+
+
+# ------------------------------------------------------------------ #
+# pgvector index-backed retrieval
+# ------------------------------------------------------------------ #
+
+
+def _postgres_session(rows: list) -> MagicMock:
+    """A stand-in session that reports a PostgreSQL dialect and returns *rows*."""
+    db = MagicMock()
+    db.bind.dialect.name = "postgresql"
+    result = MagicMock()
+    result.all.return_value = rows
+    db.exec.return_value = result
+    return db
+
+
+def _base_statement():
+    return select(DocumentChunk, Document).join(Document, DocumentChunk.document_id == Document.id)
+
+
+def test_supports_pgvector_ann_only_on_postgres(db_session: Session):
+    """SQLite (dev/tests) must keep using the in-Python scoring path."""
+    assert _supports_pgvector_ann(db_session) is False
+    assert _supports_pgvector_ann(_postgres_session([])) is True
+
+
+def test_ann_query_uses_cosine_operator_without_selecting_embeddings():
+    """Retrieval must push ranking into the index and keep vectors off the wire."""
+    db = _postgres_session([])
+
+    _pgvector_candidates(db, _base_statement(), _create_vector(0.1), top_k=5, threshold=0.7)
+
+    statement = db.exec.call_args.args[0]
+    sql = str(statement.compile(dialect=postgresql.dialect())).lower()
+
+    assert "<=>" in sql
+    assert "order by" in sql
+    assert "limit" in sql
+    # defer(DocumentChunk.embedding) keeps the 1536-dim vector out of the select list.
+    assert "embedding as embedding" not in sql
+
+
+def test_ann_results_respect_the_score_threshold():
+    doc = Document(
+        title="PMFME Guidelines",
+        source_name="MoFPI",
+        document_type="guideline",
+        content_hash="hash_ann_doc",
+        active=True,
+        language="en",
+    )
+    near = DocumentChunk(id=uuid4(), document_id=doc.id, chunk_index=0, content="near")
+    far = DocumentChunk(id=uuid4(), document_id=doc.id, chunk_index=1, content="far")
+    db = _postgres_session([(near, doc, 0.93), (far, doc, 0.42)])
+
+    candidates = _pgvector_candidates(
+        db, _base_statement(), _create_vector(0.1), top_k=5, threshold=0.7
+    )
+
+    assert len(candidates) == 1
+    assert candidates[0][0].id == near.id
+    assert candidates[0][2] == pytest.approx(0.93)
+
+
+def test_ann_failure_falls_back_to_python_scoring():
+    """A failing vector query must not take retrieval down with it."""
+    db = _postgres_session([])
+    db.exec.side_effect = Exception("operator does not exist: vector <=> unknown")
+
+    assert (
+        _pgvector_candidates(db, _base_statement(), _create_vector(0.1), top_k=5, threshold=0.7)
+        is None
+    )
+    # begin_nested() is used so the caller's transaction survives the failure.
+    assert db.begin_nested.called

@@ -736,18 +736,24 @@ def _import_location(db: Session, row: LocationRow, prov: Provenance, report: Im
     village_id = _require_village(db, row, report)
     if report.dry_run:
         return None
-    updates = {}
+    updates: dict[str, Any] = {}
     if row.pin_code:
         updates["pin_code"] = row.pin_code
     if row.latitude is not None:
         updates["latitude"] = row.latitude
     if row.longitude is not None:
         updates["longitude"] = row.longitude
+    # Radius queries filter on geom alone (so the GiST index can be used), so the
+    # geography column has to follow any coordinate update — otherwise the village
+    # silently drops out of every nearby-village lookup.
+    if row.latitude is not None and row.longitude is not None:
+        updates["geom"] = _point_wkt(row.latitude, row.longitude)
     if updates:
         village = db.get(Village, village_id)
         if village is None:
             raise ValueError(f"village {village_id} not found — cannot apply updates")
         for key, value in updates.items():
+            # geom stays a plain WKT string, exactly as the record constructors assign it.
             setattr(village, key, value)
         db.add(village)
     return None

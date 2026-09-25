@@ -430,11 +430,14 @@ def test_full_vertical_slice_api_routes(client: TestClient):
         "language": "en",
     }
 
+    mock_pending_run = mock_completed_run.model_copy(update={"status": "pending"})
+
     with (
         patch(
-            "app.api.routes.analysis.AnalysisOrchestrator.run_analysis_pipeline",
-            return_value=mock_completed_run,
+            "app.api.routes.analysis.AnalysisOrchestrator.create_run",
+            return_value=mock_pending_run,
         ),
+        patch("app.api.routes.analysis.AnalysisOrchestrator.run_analysis_pipeline"),
         patch(
             "app.api.routes.analysis.AnalysisService.get_analysis_run",
             return_value=mock_completed_run,
@@ -444,11 +447,12 @@ def test_full_vertical_slice_api_routes(client: TestClient):
             return_value=mock_consolidated,
         ),
     ):
+        # Submission returns immediately with a pollable id; results arrive later.
         post_resp = client.post("/api/v1/analysis", json=post_payload)
         assert post_resp.status_code == 201
         post_data = post_resp.json()
         assert post_data["analysis_id"] == str(analysis_id)
-        assert post_data["status"] == "completed"
+        assert post_data["status"] == "pending"
 
         # 2. Test GET /api/v1/analysis/{id}
         get_resp = client.get(f"/api/v1/analysis/{analysis_id}")

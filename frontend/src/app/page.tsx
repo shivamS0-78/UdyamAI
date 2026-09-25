@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -18,15 +18,19 @@ import {
   Zap,
   FileSpreadsheet,
   Globe2,
+  Menu,
+  X,
 } from "lucide-react";
 import LanguageSwitcher from "@/components/ui/LanguageSwitcher";
 import DarkModeToggle from "@/components/ui/DarkModeToggle";
+import PWAInstallButton from "@/components/ui/PWAInstallButton";
 import { useTranslation } from "@/stores/languageStore";
 import StatusBadge from "@/components/ui/StatusBadge";
 import Logo from "@/components/ui/Logo";
 
 export default function HomePage() {
   const { t } = useTranslation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <main className="min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-primary transition-colors duration-200">
@@ -36,7 +40,7 @@ export default function HomePage() {
           {/* Logo */}
           <Logo href="/" size="md" />
 
-          {/* Links */}
+          {/* Desktop Navigation Links */}
           <div className="hidden items-center gap-6 lg:gap-8 md:flex">
             <a
               href="#how-it-works"
@@ -59,6 +63,8 @@ export default function HomePage() {
               {t('nav.why')}
             </a>
 
+            <PWAInstallButton variant="compact" />
+
             <LanguageSwitcher compact />
 
             <DarkModeToggle />
@@ -72,18 +78,65 @@ export default function HomePage() {
             </Link>
           </div>
 
-          {/* Mobile get started */}
+          {/* Mobile Navigation Controls */}
           <div className="flex items-center gap-2 md:hidden">
+            <PWAInstallButton variant="compact" />
             <LanguageSwitcher compact />
             <DarkModeToggle />
-            <Link
-              href="/login"
-              className="inline-flex items-center rounded-full bg-primary px-3.5 py-1.5 text-xs font-bold text-white shadow-fintech-btn"
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 rounded-xl text-foreground-muted hover:bg-neutral-100 dark:hover:bg-neutral-800 transition active:scale-95"
+              aria-label="Toggle menu"
             >
-              {t('nav.getStarted')}
-            </Link>
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
           </div>
         </nav>
+
+        {/* Mobile Dropdown Menu Drawer */}
+        {mobileMenuOpen && (
+          <div className="md:hidden mt-2 p-4 rounded-3xl border border-border bg-white/95 dark:bg-[#161B22]/95 backdrop-blur-xl shadow-2xl space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="flex flex-col space-y-2">
+              <a
+                href="#how-it-works"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-4 py-2.5 rounded-xl text-sm font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition"
+              >
+                {t('nav.howItWorks')}
+              </a>
+              <a
+                href="#features"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-4 py-2.5 rounded-xl text-sm font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition"
+              >
+                {t('nav.features')}
+              </a>
+              <a
+                href="#why"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-4 py-2.5 rounded-xl text-sm font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition"
+              >
+                {t('nav.why')}
+              </a>
+            </div>
+
+            <div className="pt-2 border-t border-border">
+              <PWAInstallButton variant="banner" className="w-full" />
+            </div>
+
+            <div className="pt-2">
+              <Link
+                href="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-center gap-2 w-full rounded-2xl bg-primary py-3.5 text-sm font-bold text-white shadow-fintech-btn"
+              >
+                {t('nav.getStarted')}
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* ================= HERO SECTION ================= */}
@@ -133,6 +186,8 @@ export default function HomePage() {
                   {t('home.startAnalysis')}
                   <ArrowRight className="h-5 w-5" />
                 </Link>
+
+                <PWAInstallButton variant="secondary" />
 
                 <a
                   href="#features"

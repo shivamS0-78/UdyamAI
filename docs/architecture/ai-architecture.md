@@ -158,7 +158,9 @@ try:
     # 1. LLM Generation and Guardrail validation
     advice = generate_llm_advice(context, language)
 except Exception as exc:
-    logger.warning("LLM generation failed: %s; falling back to deterministic advice", exc)
+    logger.warning(
+        "LLM generation failed: %s; falling back to deterministic advice", exc
+    )
     advice = _backend_grounded_advice(prepared_context, language=language)
 ```
 

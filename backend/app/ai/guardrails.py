@@ -4,7 +4,18 @@ import re
 from typing import Any
 
 _REQUIRED_CORE_FIELDS = {"summary", "recommendation"}
-_ALLOWED_LANGUAGES = {"en", "hi", "mr"}
+_ALLOWED_LANGUAGES = {
+    "en",
+    "hi",
+    "mr",
+    "ta",
+    "te",
+    "kn",
+    "gu",
+    "bn",
+    "pa",
+    "ml",
+}
 _ALLOWED_CONFIDENCE = {"high", "medium", "low", "unverified"}
 _ALLOWED_SOURCE_TYPES = {"document", "scheme_rule", "data_source"}
 

@@ -10,6 +10,7 @@ from __future__ import annotations
 import logging
 import os
 
+from app.cache import get_cache, llm_cache_key
 from app.config import settings
 
 logger = logging.getLogger(__name__)
@@ -17,14 +18,20 @@ logger = logging.getLogger(__name__)
 # Ordered fallback lists — tried in sequence when the preferred model fails.
 # To switch providers, change AI_PROVIDER / AI_MODEL env vars; never edit this file.
 _GEMINI_MODELS = (
-    "gemini-3.6-flash",
-    "gemini-3-flash-preview",
     "gemini-2.5-flash",
+    "gemini-2.5-flash-lite",
+    "gemini-2.5-flash",
+    "gemini-flash-latest",
 )
 _OPENAI_MODELS = (
     "gpt-4o-mini",
-    "gpt-4.1-mini",
     "gpt-4o",
+)
+
+_RETIRED_GEMINI_MODELS = frozenset(
+    {
+        "gemini-1.0-pro",
+    }
 )
 
 
@@ -72,9 +79,22 @@ def _unique(models: list[str | None]) -> list[str]:
 
 
 def _gemini_models() -> list[str]:
-    """Return Gemini model IDs to try, env-configured model first."""
+    """Return Gemini model IDs to try, env-configured model first.
+
+    A configured model that Google has since shut down is skipped rather than tried,
+    so a stale ``AI_MODEL`` degrades to a warning instead of a wasted request on every
+    generation.
+    """
     configured = _configured_model()
     preferred = configured if configured and "gpt" not in configured.lower() else None
+    if preferred and preferred.lower() in _RETIRED_GEMINI_MODELS:
+        logger.warning(
+            "AI_MODEL=%s has been shut down by Google and will be skipped. "
+            "Update AI_MODEL in your .env, e.g. to %s.",
+            preferred,
+            _GEMINI_MODELS[0],
+        )
+        preferred = None
     return _unique([preferred, *_GEMINI_MODELS])
 
 
@@ -85,22 +105,43 @@ def _openai_models() -> list[str]:
     return _unique([preferred, *_OPENAI_MODELS])
 
 
-def generate(prompt: str) -> str:
+def generate(prompt: str, user_id: str | None = None) -> str:
     """Call the configured provider and return its raw text response.
 
     Tries the preferred provider first, then the other provider, using
     provider-specific model names (never send a Gemini model id to OpenAI).
     """
     preferred = _configured_provider()
+    model_name = _configured_model() or "default"
+    cache_key = llm_cache_key(prompt, f"{preferred}:{model_name}", user_id=user_id)
+
+    try:
+        cached_result = get_cache().get(cache_key)
+        if cached_result is not None and isinstance(cached_result, str) and cached_result.strip():
+            logger.info("Serving LLM response from cache")
+            return cached_result
+    except Exception as exc:
+        logger.debug("LLM cache read failed: %s", exc)
+
     order = ["gemini", "openai"] if preferred != "openai" else ["openai", "gemini"]
     errors: list[str] = []
 
     for provider in order:
         try:
             if provider == "gemini" and settings.GEMINI_API_KEY:
-                return _generate_gemini(prompt)
+                res = _generate_gemini(prompt)
+                try:
+                    get_cache().set(cache_key, res, ttl=settings.CACHE_TTL)
+                except Exception:
+                    pass
+                return res
             if provider == "openai" and settings.OPENAI_API_KEY:
-                return _generate_openai(prompt)
+                res = _generate_openai(prompt)
+                try:
+                    get_cache().set(cache_key, res, ttl=settings.CACHE_TTL)
+                except Exception:
+                    pass
+                return res
         except LLMError as exc:
             logger.warning("%s generation failed: %s", provider, exc)
             errors.append(f"{provider}: {exc}")

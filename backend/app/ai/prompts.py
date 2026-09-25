@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import json
 
+_ALLOWED_LANGUAGES = {"en", "hi", "mr", "ta", "te", "kn", "gu", "bn", "pa", "ml"}
+
 
 def build_advisor_prompt(context: dict, language: str = "en") -> str:
     """Build a grounded prompt that asks the LLM to explain verified data and RAG evidence."""
-    normalized_language = language if language in {"en", "hi", "mr"} else "en"
+    normalized_language = language if language in _ALLOWED_LANGUAGES else "en"
     pretty_context = json.dumps(context, ensure_ascii=False, default=str)
 
     rag_status = context.get("rag_status")

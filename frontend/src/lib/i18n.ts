@@ -1,18 +1,47 @@
-export type Language = 'en' | 'hi' | 'mr';
+export type Language =
+  | 'en'
+  | 'hi'
+  | 'mr'
+  | 'ta'
+  | 'te'
+  | 'kn'
+  | 'gu'
+  | 'bn'
+  | 'pa'
+  | 'ml';
 
 export const LANGUAGE_OPTIONS: { value: Language; nativeLabel: string; englishLabel: string }[] = [
   { value: 'en', nativeLabel: 'English', englishLabel: 'English' },
   { value: 'hi', nativeLabel: 'हिंदी', englishLabel: 'Hindi' },
   { value: 'mr', nativeLabel: 'मराठी', englishLabel: 'Marathi' },
+  { value: 'ta', nativeLabel: 'தமிழ்', englishLabel: 'Tamil' },
+  { value: 'te', nativeLabel: 'తెలుగు', englishLabel: 'Telugu' },
+  { value: 'kn', nativeLabel: 'ಕನ್ನಡ', englishLabel: 'Kannada' },
+  { value: 'gu', nativeLabel: 'ગુજરાતી', englishLabel: 'Gujarati' },
+  { value: 'bn', nativeLabel: 'বাংলা', englishLabel: 'Bengali' },
+  { value: 'pa', nativeLabel: 'ਪੰਜਾਬੀ', englishLabel: 'Punjabi' },
+  { value: 'ml', nativeLabel: 'മലയാളം', englishLabel: 'Malayalam' },
 ];
 
 export const LANGUAGE_STORAGE_KEY = 'udyam_language';
 
+const LANGUAGE_SET: ReadonlySet<string> = new Set(LANGUAGE_OPTIONS.map((o) => o.value));
+
 export function isLanguage(value: string | null | undefined): value is Language {
-  return value === 'en' || value === 'hi' || value === 'mr';
+  return typeof value === 'string' && LANGUAGE_SET.has(value);
 }
 
 type Dict = Record<string, string>;
+
+export type { Dict };
+
+import { ta } from './locales/ta';
+import { te } from './locales/te';
+import { kn } from './locales/kn';
+import { gu } from './locales/gu';
+import { bn } from './locales/bn';
+import { pa } from './locales/pa';
+import { ml } from './locales/ml';
 
 const en: Dict = {
   'borrowing.badge': 'Micro Loans & Financing',
@@ -150,6 +179,13 @@ const en: Dict = {
   'lang.en': 'English',
   'lang.hi': 'Hindi',
   'lang.mr': 'Marathi',
+  'lang.ta': 'Tamil',
+  'lang.te': 'Telugu',
+  'lang.kn': 'Kannada',
+  'lang.gu': 'Gujarati',
+  'lang.bn': 'Bengali',
+  'lang.pa': 'Punjabi',
+  'lang.ml': 'Malayalam',
 
   'home.badge': 'AI-powered business guidance',
   'home.heroLine1': 'Turn your business',
@@ -233,18 +269,18 @@ const en: Dict = {
   'onboard.eyebrow': 'Smart business guidance',
   'onboard.title': 'Make better business decisions with UdyamAI.',
   'onboard.desc':
-    'Get a real-time data feasibility assessment and discover relevant opportunities based on your Maharashtra location, business and capital.',
+    'Get a real-time data feasibility assessment and discover relevant opportunities based on your location, business and capital across India.',
   'onboard.startTitle': 'Start your analysis',
   'onboard.reviewCta': 'Review Details →',
   'onboard.needTitle': 'What you’ll need',
   'onboard.needLocation': 'Location',
-  'onboard.needLocationDesc': 'District, taluka/block, and village',
+  'onboard.needLocationDesc': 'State, district, taluka/block, and village',
   'onboard.needBusiness': 'Business choice',
   'onboard.needBusinessDesc': 'The business category you want to explore',
   'onboard.needCapital': 'Capital',
   'onboard.needCapitalDesc': 'Your available capital and required inputs',
   'onboard.locTitle': '1. Tell us your location',
-  'onboard.locDesc': 'Select your district, taluka/block, and village in Maharashtra.',
+  'onboard.locDesc': 'Select your state, district, taluka/block, and village across India.',
   'onboard.selectDistrict': 'Select district',
   'onboard.selectTaluka': 'Select taluka',
   'onboard.selectVillage': 'Select village',
@@ -297,6 +333,9 @@ const en: Dict = {
   'dash.marketScore': 'Market Demand Score',
   'dash.financialScore': 'Financial Feasibility',
   'dash.competitionScore': 'Competition Margin',
+  'dash.aiAdvisor': 'AI Advisor Intelligence (RAG Verified)',
+  'dash.nextSteps': 'Recommended Strategic Next Steps',
+  'dash.ragVerified': 'Verified by RAG',
   'dash.advisorTitle': 'UdyamAI Advisor Guidance (RAG Verified)',
   'dash.advisorEmpty': 'Advisor guidance will appear here after analysis completes.',
   'dash.recommendations': 'Strategic Recommendations',
@@ -382,7 +421,7 @@ const en: Dict = {
   'schemes.badge': 'Government Welfare Directory',
   'schemes.title': 'Enterprise Subsidy & Welfare Schemes',
   'schemes.desc':
-    'Explore state and national capital support schemes, interest subventions, and collateral-free bank loan facilities curated for rural micro-entrepreneurs in Maharashtra.',
+    'Explore state and national capital support schemes, interest subventions, and collateral-free bank loan facilities curated for rural and micro-entrepreneurs across India.',
   'schemes.check': 'Check My Scheme Eligibility',
   'schemes.search': 'Search schemes by name, agency, or industry...',
 
@@ -503,6 +542,13 @@ const hi: Dict = {
   'lang.en': 'अंग्रेज़ी',
   'lang.hi': 'हिंदी',
   'lang.mr': 'मराठी',
+  'lang.ta': 'तमिल',
+  'lang.te': 'तेलुगु',
+  'lang.kn': 'कन्नड़',
+  'lang.gu': 'गुजराती',
+  'lang.bn': 'बंगाली',
+  'lang.pa': 'पंजाबी',
+  'lang.ml': 'मलयालम',
 
   'home.badge': 'एआई-संचालित व्यावसायिक मार्गदर्शन',
   'home.heroLine1': 'अपने व्यवसाय',
@@ -650,6 +696,9 @@ const hi: Dict = {
   'dash.marketScore': 'बाज़ार माँग स्कोर',
   'dash.financialScore': 'वित्तीय व्यवहार्यता',
   'dash.competitionScore': 'प्रतिस्पर्धा मार्जिन',
+  'dash.aiAdvisor': 'एआई सलाहकार मार्गदर्शन (RAG सत्यापित)',
+  'dash.nextSteps': 'अनुशंसित रणनीतिक अगले कदम',
+  'dash.ragVerified': 'RAG द्वारा सत्यापित',
   'dash.advisorTitle': 'उद्यमएआई सलाहकार मार्गदर्शन (आरएजी सत्यापित)',
   'dash.advisorEmpty': 'विश्लेषण पूरा होने के बाद सलाहकार मार्गदर्शन यहाँ दिखेगा।',
   'dash.recommendations': 'रणनीतिक सुझाव',
@@ -889,6 +938,13 @@ const mr: Dict = {
   'lang.en': 'इंग्रजी',
   'lang.hi': 'हिंदी',
   'lang.mr': 'मराठी',
+  'lang.ta': 'तमिळ',
+  'lang.te': 'तेलुगू',
+  'lang.kn': 'कन्नड',
+  'lang.gu': 'गुजराती',
+  'lang.bn': 'बंगाली',
+  'lang.pa': 'पंजाबी',
+  'lang.ml': 'मल्याळम',
 
   'home.badge': 'एआय-आधारित व्यावसायिक मार्गदर्शन',
   'home.heroLine1': 'तुमची व्यवसाय',
@@ -1036,6 +1092,9 @@ const mr: Dict = {
   'dash.marketScore': 'बाजार मागणी गुण',
   'dash.financialScore': 'आर्थिक व्यवहार्यता',
   'dash.competitionScore': 'स्पर्धा मार्जिन',
+  'dash.aiAdvisor': 'एआय सल्लागार मार्गदर्शन (RAG सत्यापित)',
+  'dash.nextSteps': 'शिफारस केलेले पुढील धोरणात्मक पाऊले',
+  'dash.ragVerified': 'RAG द्वारे सत्यापित',
   'dash.advisorTitle': 'उद्यमएआय सल्लागार मार्गदर्शन (आरएजी सत्यापित)',
   'dash.advisorEmpty': 'विश्लेषण पूर्ण झाल्यावर सल्लागार मार्गदर्शन येथे दिसेल.',
   'dash.recommendations': 'सामरिक शिफारसी',
@@ -1171,7 +1230,18 @@ const mr: Dict = {
   'setup.fail': 'प्रोफाइल जतन करता आले नाही. बॅकएंड सुरू आहे का ते तपासून पुन्हा प्रयत्न करा.',
 };
 
-const DICTS: Record<Language, Dict> = { en, hi, mr };
+const DICTS: Record<Language, Dict> = {
+  en,
+  hi,
+  mr,
+  ta,
+  te,
+  kn,
+  gu,
+  bn,
+  pa,
+  ml,
+};
 
 export function translate(language: Language, key: string, fallback?: string): string {
   return DICTS[language]?.[key] ?? DICTS.en?.[key] ?? fallback ?? key;

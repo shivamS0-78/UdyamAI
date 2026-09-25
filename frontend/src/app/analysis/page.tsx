@@ -4,7 +4,7 @@ import React from 'react';
 import AppShell from '@/components/ui/AppShell';
 import Link from 'next/link';
 import { useTranslation } from '@/stores/languageStore';
-import { BarChart3, ArrowRight, LayoutDashboard, Sparkles, Plus, TrendingUp } from 'lucide-react';
+import { BarChart3, ArrowRight, LayoutDashboard, Sparkles, Plus, TrendingUp, ShieldCheck } from 'lucide-react';
 
 export default function AnalysisPage() {
   const { t } = useTranslation();
@@ -61,7 +61,12 @@ export default function AnalysisPage() {
               <div className="w-12 h-12 rounded-2xl bg-primary-50 dark:bg-primary/10 text-primary dark:text-emerald-400 flex items-center justify-center mb-6">
                 <LayoutDashboard className="h-6 w-6" />
               </div>
-              <h3 className="text-xl font-bold text-foreground dark:text-foreground-dark">Executive Dashboard & RAG Guidance</h3>
+              <div className="flex items-center justify-between gap-2 flex-wrap mb-2">
+                <h3 className="text-xl font-bold text-foreground dark:text-foreground-dark">Executive Dashboard & RAG Guidance</h3>
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 shadow-xs">
+                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" /> Verified by RAG
+                </span>
+              </div>
               <p className="text-sm text-foreground-muted mt-2 leading-relaxed">
                 Review existing feasibility index scores, competitive spatial mandis, scheme matching, and AI recommendations.
               </p>

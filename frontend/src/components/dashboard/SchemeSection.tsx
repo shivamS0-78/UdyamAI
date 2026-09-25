@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Award, CheckCircle2, Building2, ExternalLink, Landmark, Sparkles } from 'lucide-react';
+import { Award, CheckCircle2, Building2, ExternalLink, Landmark, Sparkles, ShieldCheck } from 'lucide-react';
 
 interface SchemeSectionProps {
   data?: any;
@@ -94,16 +94,26 @@ export default function SchemeSection({ data }: SchemeSectionProps) {
       <div className="rounded-2xl border border-border bg-white dark:bg-[#161B22] p-6 shadow-subtle">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6 border-b border-border pb-4">
           <div>
-            <h3 className="text-lg font-bold text-foreground tracking-tight">
-              Government Welfare & Capital Subsidy Schemes
-            </h3>
+            <div className="flex items-center gap-2">
+              <h3 className="text-lg font-bold text-foreground tracking-tight">
+                Government Welfare & Capital Subsidy Schemes
+              </h3>
+              <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30">
+                <ShieldCheck className="h-3 w-3" /> Verified by RAG
+              </span>
+            </div>
             <p className="text-xs text-muted-foreground mt-0.5">
               Verified eligibility against state & national enterprise guidelines
             </p>
           </div>
-          <span className="text-xs font-semibold px-3 py-1 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 rounded-full flex items-center gap-1.5 self-start sm:self-auto">
-            <CheckCircle2 className="h-3.5 w-3.5" /> Direct Govt. Support
-          </span>
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            <span className="text-xs font-semibold px-3 py-1 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 rounded-full flex items-center gap-1.5">
+              <CheckCircle2 className="h-3.5 w-3.5" /> Direct Govt. Support
+            </span>
+            <span className="sm:hidden inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30">
+              <ShieldCheck className="h-3 w-3" /> Verified by RAG
+            </span>
+          </div>
         </div>
 
         <div className="flex flex-col gap-4">
@@ -116,9 +126,14 @@ export default function SchemeSection({ data }: SchemeSectionProps) {
           {/* AI Scheme Guidance (when no schemes matched but AI has advice) */}
           {matchedSchemes.length === 0 && schemeAdviceList.length > 0 && (
             <div className="rounded-2xl border border-primary/20 dark:border-primary/30 bg-primary/5 dark:bg-primary/10 p-6 shadow-subtle">
-              <p className="text-xs font-bold uppercase tracking-wider text-primary mb-3">
-                AI Scheme Guidance
-              </p>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs font-bold uppercase tracking-wider text-primary">
+                  AI Scheme Guidance
+                </p>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30">
+                  <ShieldCheck className="h-3 w-3" /> Verified by RAG
+                </span>
+              </div>
               <ul className="space-y-2">
                 {schemeAdviceList.map((advice: string, i: number) => (
                   <li key={i} className="text-sm text-foreground flex items-start gap-2">
@@ -147,13 +162,18 @@ export default function SchemeSection({ data }: SchemeSectionProps) {
                     </div>
                     <h4 className="font-bold text-foreground text-sm sm:text-base">{title}</h4>
                   </div>
-                  <span
-                    className={`inline-flex items-center px-3 py-1 text-xs font-bold rounded-full border ${getEligibilityBadge(
-                      s.match_status
-                    )}`}
-                  >
-                    {statusLabel}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-bold rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30">
+                      <ShieldCheck className="h-3 w-3" /> Verified by RAG
+                    </span>
+                    <span
+                      className={`inline-flex items-center px-3 py-1 text-xs font-bold rounded-full border ${getEligibilityBadge(
+                        s.match_status
+                      )}`}
+                    >
+                      {statusLabel}
+                    </span>
+                  </div>
                 </div>
 
                 {s.description && (

@@ -4,6 +4,7 @@ from datetime import date, datetime, timezone
 from unittest.mock import MagicMock, patch
 from uuid import uuid4
 
+from app.models.business import BusinessCategory
 from app.models.scheme import (
     Scheme,
     SchemeEligibilityRule,
@@ -436,3 +437,45 @@ class TestSchemeIntegrationRules:
                 missing_information={"details": "Guaranteed loan option pending doc review"},
             )
         assert "Prohibited term 'guaranteed loan'" in str(exc.value)
+
+
+# ------------------------------------------------------------------ #
+# Matcher — batched rule lookup
+# ------------------------------------------------------------------ #
+
+
+def _scripted_all(rows):
+    """A query result whose ``.all()`` returns *rows*."""
+    result = MagicMock()
+    result.all.return_value = rows
+    return result
+
+
+class TestMatchSchemesForAnalysisQueryCount:
+    """The matcher must resolve every scheme's rules in a single batched query."""
+
+    def test_rules_are_loaded_in_one_query_even_for_schemes_without_rules(self):
+        from app.schemes.matcher import match_schemes_for_analysis
+
+        covered = Scheme(id=uuid4(), name="PMEGP", active=True)
+        uncovered = Scheme(id=uuid4(), name="Scheme Without Rules", active=True)
+        rule = SchemeRule(scheme_id=covered.id, loan_percent=90.0)
+
+        mock_db = MagicMock()
+        mock_db.exec.side_effect = [
+            _scripted_all([covered, uncovered]),
+            _scripted_all([rule]),
+        ]
+
+        matches = match_schemes_for_analysis(
+            mock_db,
+            analysis_run_id=uuid4(),
+            business_category=BusinessCategory(id=uuid4(), name="Dairy Processing"),
+            district=None,
+            desired_project_cost=200_000.0,
+            available_capital=50_000.0,
+        )
+
+        # Exactly two round-trips: the active schemes, then all their rules.
+        assert mock_db.exec.call_count == 2
+        assert [m.scheme_id for m in matches] == [covered.id]

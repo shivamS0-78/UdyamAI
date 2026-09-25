@@ -34,8 +34,13 @@ def test_create_analysis_v1(client, dummy_run):
         "business_category_id": str(dummy_run.business_category_id),
         "available_capital": 50000.0,
     }
-    with patch(
-        "app.api.routes.analysis.AnalysisOrchestrator.run_analysis_pipeline", return_value=dummy_run
+    with (
+        patch(
+            "app.api.routes.analysis.AnalysisOrchestrator.create_run", return_value=dummy_run
+        ) as mock_create,
+        patch(
+            "app.api.routes.analysis.AnalysisOrchestrator.run_analysis_pipeline"
+        ) as mock_pipeline,
     ):
         response = client.post("/api/v1/analysis", json=payload)
         assert response.status_code == 201
@@ -44,6 +49,12 @@ def test_create_analysis_v1(client, dummy_run):
         assert data["id"] == str(dummy_run.id)
         assert data["status"] == "created"
 
+    # The run is persisted up front so the client gets an id immediately, and the pipeline
+    # is deferred to a background task rather than blocking the request.
+    assert mock_create.call_args.kwargs["status"] == "pending"
+    mock_pipeline.assert_called_once()
+    assert mock_pipeline.call_args.kwargs["run_id"] == dummy_run.id
+
 
 def test_create_analysis_location_not_found(client, dummy_run):
     payload = {
@@ -51,8 +62,10 @@ def test_create_analysis_location_not_found(client, dummy_run):
         "location_id": str(uuid4()),
         "available_capital": 50000.0,
     }
+    # Input is validated by the synchronous run-creation step, so a bad location still
+    # fails the request itself rather than a background task.
     with patch(
-        "app.api.routes.analysis.AnalysisOrchestrator.run_analysis_pipeline",
+        "app.api.routes.analysis.AnalysisOrchestrator.create_run",
         side_effect=HTTPException(
             status_code=404, detail="Location with identifier 'xyz' not found"
         ),
